@@ -7,3 +7,11 @@
 
 /* Release marker stays visible on phones to distinguish deployed builds; never traps touch. */
 .stage-release{position:absolute;top:10px;left:12px;font:700 10px Arial,sans-serif;color:#60818b;opacity:.7;pointer-events:none;z-index:3;direction:ltr}
+
+/* v0.3 electronic annotation UI. Retains touch-action:auto on stage, none on atoms. */
+.atom-state-mark{position:absolute;right:-13px;top:-10px;min-width:21px;font:700 11px Arial,sans-serif;background:#173f50;color:white;padding:4px 6px;border-radius:12px;text-align:center;pointer-events:none;direction:ltr}
+.electron-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.electron-editor-grid label{font-size:13px;font-weight:700;color:#264c59;display:flex;flex-direction:column;gap:8px}
+.electron-editor-grid select{width:100%;min-height:45px;border:1px solid #cadcde;border-radius:10px;font:inherit;background:#fff;color:#123b4c;padding:8px}
+.electron-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+@media(max-width:650px){.electron-editor-grid{grid-template-columns:1fr}.atom-state-mark{font-size:10px}}
