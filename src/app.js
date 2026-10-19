@@ -18,25 +18,11 @@ const ELEMENT_FACTS={
 };
 // Nature and industrial preparation are independent properties, never exclusive categories.
 // Curated educational notes only; missing statements are not evidence of non-existence.
-const OCCURRENCE={
- h2:['موجود طبيعيًا في النجوم ووسط الكون.','يُنتَج صناعيًا.'],
- o2:['يوجد طبيعيًا في الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
- n2:['يشكل معظم الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
- cl2:[null,'يُنتَج صناعيًا، وهو غاز سام.'],
- hcl:['يوجد في بعض الغازات البركانية.','يُنتَج صناعيًا.'],
- water:['يوجد طبيعيًا في البحار والأنهار والسحب والكائنات الحية.','يمكن إنتاجه أو استخلاصه ومعالجته صناعيًا.'],
- ozone:['يوجد طبيعيًا في الغلاف الجوي.','يمكن إنتاجه بواسطة أجهزة توليد الأوزون.'],
- co2:['يوجد طبيعيًا في الهواء وينتج عن تنفس الكائنات الحية.','يُنتَج أو يُستخلص صناعيًا.'],
- methane:['يوجد في الغاز الطبيعي وبيئات حيوية معينة.','يمكن إنتاجه صناعيًا.'],
- ammonia:['يوجد بكميات صغيرة في الطبيعة.','يُنتَج صناعيًا لإنتاج الأسمدة.'],
- peroxide:['قد يتكون بكميات صغيرة في عمليات طبيعية.','يُنتَج صناعيًا.'],
- formaldehyde:['قد يتكوّن في عمليات طبيعية وحيوية.','يُنتَج صناعيًا.'],
- ethane:['يوجد في الغاز الطبيعي.','يُفصل ضمن العمليات الصناعية لمعالجة الغاز.'],
- ethene:['تُنتجه النباتات، ويشارك في نضج بعض الثمار.','يُنتَج صناعيًا لإنتاج البوليمرات.'],
- ethyne:[null,'يُنتَج صناعيًا.'],
- methanol:['يوجد بكميات ضئيلة في مصادر طبيعية.','يُنتَج صناعيًا، وهو سام.'],
- ethanol:['يمكن أن ينشأ طبيعيًا بفعل التخمر.','يُنتَج صناعيًا لأغراض عديدة.'],
- dme:[null,'يُنتَج صناعيًا.']
+/* Evidence-curated subset: missing metadata is unknown, not proof of absence. */
+const EVIDENCE={
+ water:{natural:{note:'يوجد الماء في البحار والأنهار والأمطار والكائنات الحية.',url:'https://pubchem.ncbi.nlm.nih.gov/compound/Water',source:'PubChem — Water (CID 962)'}},
+ ozone:{natural:{note:'يوجد الأوزون طبيعيًا في الغلاف الجوي، بما في ذلك الستراتوسفير.',url:'https://www.epa.gov/ground-level-ozone-pollution/ground-level-ozone-basics',source:'US EPA — Ozone Basics'},
+ industrial:{note:'يمكن تحضير الأوزون صناعيًا واستخدامه في معالجة المياه.',url:'https://pubchem.ncbi.nlm.nih.gov/compound/Ozone',source:'PubChem — Ozone (CID 24823)'}}
 };
 let promptedFor=new Set(),promptSymbol=null;
 function infoPrompt(symbol){
@@ -56,6 +42,23 @@ function showElementFacts(symbol){
  <div class="analysis-note">${htmlEscape(fact.note)}</div><p class="analysis-small">هذه أمثلة تعليمية للروابط التساهمية. القاعدة المبسطة ليست حدًا مطلقًا، ولا تثبت وحدها وجود مادة أو استقرارها.</p>`;
  showModal('element-details');
 }
+function showElectronEditor(){
+ const a=atoms.find(x=>x.id===selected);if(!a)return;
+ $('#electron-target').textContent='ذرة '+ELEMENTS[a.symbol].name+' — '+a.symbol;
+ $('#electron-charge').value=Number.isInteger(a.formalCharge)?String(a.formalCharge):'';
+ $('#electron-radicals').value=Number.isInteger(a.unpairedElectrons)?String(a.unpairedElectrons):'';
+ $('#electron-feedback').textContent='اترك القيم فارغة إذا لم ترغب بتوصيف إلكتروني.';
+ showModal('electrons-editor');
+}
+function saveElectronEditor(){
+ const a=atoms.find(x=>x.id===selected);if(!a)return;
+ const ch=$('#electron-charge').value,ra=$('#electron-radicals').value;
+ if((ch==='')!==(ra==='')){$('#electron-feedback').textContent='حدد كلا الحقلين أو اتركهما فارغين.';return;}
+ pushUndo();
+ if(ch===''){delete a.formalCharge;delete a.unpairedElectrons;}
+ else{a.formalCharge=Number(ch);a.unpairedElectrons=Number(ra);}
+ closeModal('electrons-editor');render();
+}
 function showStructureReport(){
  const info=inspectStructure(atoms,bonds),out=$('#structure-report-content'),res=info.result;
  if(!atoms.length){out.innerHTML='<div class="analysis-note">لم تضف أي ذرات بعد. أضف ذرتين على الأقل وجرّب ربطهما.</div>';showModal('structure-report');return;}
@@ -63,9 +66,12 @@ function showStructureReport(){
  let verdict='',type='',occ='';
  if(known){
   verdict=`<div class="analysis-note analysis-ok"><strong>بنية موثقة: ${htmlEscape(res.molecule.name)}</strong><div>${htmlEscape(res.molecule.overview)}</div><div>${htmlEscape(res.molecule.extra)}</div></div>`;
-  const [natural,industrial]=OCCURRENCE[res.molecule.id]||[null,null];
-  occ=`<h3 class="analysis-section-title">هل توجد في الطبيعة؟ وهل تُنتَج صناعيًا؟</h3>
-   <div class="analysis-grid"><div class="analysis-tile"><strong>الوجود في الطبيعة</strong>${htmlEscape(natural||'لم نراجع هذه المعلومة لهذا الجزيء بعد؛ لا يعني ذلك عدم وجوده في الطبيعة.')}</div><div class="analysis-tile"><strong>التحضير أو الإنتاج الصناعي</strong>${htmlEscape(industrial||'لم نراجع هذه المعلومة لهذا الجزيء بعد.')}</div></div>`;
+  const source=EVIDENCE[res.molecule.id]||{};
+  const cell=item=>item?htmlEscape(item.note)+'<p class="analysis-small"><a class="analysis-link" href="'+htmlEscape(item.url)+'" target="_blank" rel="noopener noreferrer">المصدر: '+htmlEscape(item.source)+'</a></p>':'لم تُراجع هذه المعلومة بعد؛ غياب التوثيق هنا ليس دليلًا على عدم الوجود.';
+  occ=`<h3 class="analysis-section-title">الوجود الطبيعي والتحضير الصناعي (بحسب السجلات الموثقة)</h3><div class="analysis-grid"><div class="analysis-tile"><strong>في الطبيعة</strong>${cell(source.natural)}</div><div class="analysis-tile"><strong>صناعيًا</strong>${cell(source.industrial)}</div></div>`;
+ }else if(res.kind==='electronic-variant'){
+  verdict=`<div class="analysis-note"><strong>البنية تشبه ${htmlEscape(res.molecule.name)} لكنها إلكترونيًا ليست مؤكدة النوع نفسه.</strong><div>${htmlEscape(res.message)}</div></div>`;
+
  }else if(res.kind==='overbonded'){
   verdict=`<div class="analysis-note"><strong>تعارض مع قاعدة التكافؤ التعليمية</strong><div>${htmlEscape(res.message)}</div>هذا لا يثبت الاستحالة النظرية؛ فالشحنات والحالات الإلكترونية والجذور غير ممثلة هنا.</div>`;
  }else if(res.kind==='building'||res.kind==='disconnected'){
@@ -79,10 +85,14 @@ function showStructureReport(){
  const matches=MOLECULES.filter(m=>{const t={};m.nodes.forEach(s=>t[s]=(t[s]||0)+1);return Object.keys(t).length===Object.keys(c).length && Object.entries(c).every(([k,v])=>t[k]===v)});
  const same=(!known&&matches.length)?`<div class="analysis-note">وجدنا جزيئات معروفة لها <strong>عدد الذرات نفسه</strong> في موسوعتنا، لكن ذلك لا يعني تطابق بنيتها مع رسمك: ${matches.map(m=>htmlEscape(m.name)).join('، ')}.</div>`:'';
  const electronNote=(info.totalValenceElectrons%2===1)?`<div class="analysis-note"><strong>ملاحظة إلكترونية إضافية:</strong> مجموع إلكترونات التكافؤ للذرات المرسومة هو ${info.totalValenceElectrons} (عدد فردي). إذا كان النوع الكيميائي متعادل الشحنة، فلن تكون كل إلكتروناته مزدوجة؛ لذلك لا يمكن التعامل معه باعتباره جزيئًا متعادلًا مغلق الغلاف الإلكتروني. قد يكون جذرًا أو يتطلب وصفًا مختلفًا، ولا نستنتج استقراره من ذلك.</div>`:'';
+ const e=info.electronic;
+ const eMessage=e.complete?'إدخالاتك متسقة حسابيًا؛ مجموع الشحنات الشكلية: '+e.netCharge+'، والإلكترونات غير المزدوجة المسجلة: '+e.totalRadicals+'.':e.invalid?'بعض الإدخالات لا تسمح بتوزيع إلكترونات متسق في هذا النموذج؛ راجع الذرات المحددة.':e.assigned?'لم تصف جميع الذرات إلكترونيًا؛ لا يمكن حساب الشحنة الإجمالية بعد.':'لم تحدد أي شحنات شكلية أو إلكترونات منفردة؛ التحليل بنيوي فقط.';
+ const electronicRows=e.entries.map((a,i)=>`<tr><td>${i+1}</td><td dir="ltr">${htmlEscape(a.symbol)}</td><td>${a.charge===null?'—':a.charge}</td><td>${a.radicals===null?'—':a.radicals}</td><td>${a.lonePairs===null?'—':a.lonePairs}</td><td>${htmlEscape(a.reason||'غير محدد')}</td></tr>`).join('');
+ const electronicPanel=`<h3 class="analysis-section-title">الشحنات والإلكترونات (نموذج لويس)</h3><div class="analysis-note">${htmlEscape(eMessage)} هذا فحص حسابي وليس دليلًا على استقرار المادة.</div><div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>ذرة</th><th>رمز</th><th>الشحنة الشكلية</th><th>منفردة</th><th>أزواج حرة</th><th>التفسير</th></tr></thead><tbody>${electronicRows}</tbody></table></div>`;
  const caution=known&&res.molecule.caution?`<div class="analysis-note">${htmlEscape(res.molecule.caution)}</div>`:'';
  out.innerHTML=`<div class="analysis-summary"><span class="analysis-small">الصيغة المحسوبة بعدّ الذرات</span><span class="formula">${htmlEscape(info.formula)}</span><div class="analysis-small">${type}</div></div>
  <div class="analysis-grid"><div class="analysis-tile"><strong>عدد الذرات</strong>${info.atomCount} ذرة · مجموع الكتل الذرية ${info.totalMass.toFixed(3)} u تقريبًا</div><div class="analysis-tile"><strong>عدد الروابط المرسومة</strong>${info.bondCount} رابطة (مفردة: ${info.edgeCounts.single}، مزدوجة: ${info.edgeCounts.double}، ثلاثية: ${info.edgeCounts.triple})</div></div>
- ${verdict}${electronNote}${same}${occ}<h3 class="analysis-section-title">فحص كل ذرة</h3>
+ ${verdict}${electronNote}${same}${occ}${electronicPanel}<h3 class="analysis-section-title">فحص كل ذرة</h3>
  <div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>رقم</th><th>عنصر</th><th>وصلات</th><th>مجموع رتبها</th><th>المعتاد</th><th>الملاحظة</th></tr></thead><tbody>${atomRows}</tbody></table></div>
  ${caution}<div class="analysis-note">حدود التحليل: لا يمثل هذا الإصدار الشحنة الشكلية ولا الإلكترونات الحرة أو الرنين بصورة كاملة، ولا يقدّر الاستقرار بالطاقة الكمّية أو إمكانية التصنيع. إن وصف «غير موجود في الفهرس» ليس حكمًا باستحالة وجوده.</div>
  <p class="analysis-small">للتوسع: <a class="analysis-link" href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubChem</a> وقاموس <a class="analysis-link" href="https://goldbook.iupac.org/" target="_blank" rel="noopener noreferrer">IUPAC</a> (تحتاج المواقع الخارجية إلى اتصال بالإنترنت).</p>`;
@@ -120,6 +130,7 @@ function createPalette(){const palette=$('#palette');for(const [symbol,info] of 
 function renderStage(){const field=$('#stage'),layer=$('#atoms-layer');layer.innerHTML='';
  $('#empty-state').hidden=atoms.length>0;
  for(const atom of atoms){const btn=el('button','stage-atom '+ELEMENTS[atom.symbol].tone+(selected===atom.id?' selected':''),atom.symbol);btn.type='button';btn.dataset.atomId=atom.id;btn.title=ELEMENTS[atom.symbol].name+' — اسحب لتحريكه، أو المس لربطه';btn.setAttribute('aria-label','ذرة '+ELEMENTS[atom.symbol].name);btn.style.left=(atom.x*100)+'%';btn.style.top=(atom.y*100)+'%';
+ if(Number.isInteger(atom.formalCharge)&&Number.isInteger(atom.unpairedElectrons)){const mark=el('span','atom-state-mark',(atom.formalCharge>0?'+'+atom.formalCharge:atom.formalCharge)+ (atom.unpairedElectrons?' •'+atom.unpairedElectrons:''));btn.append(mark);}
  btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();let dragging=false;const sx=e.clientX,sy=e.clientY,originX=atom.x,originY=atom.y;let snapshotTaken=false;
  btn.setPointerCapture(e.pointerId);
  const move=evt=>{if(!dragging&&Math.hypot(evt.clientX-sx,evt.clientY-sy)>7)dragging=true;if(!dragging)return;
@@ -143,7 +154,7 @@ function drawBonds(){const svg=$('#bonds-svg'),area=$('#stage'),r=area.getBoundi
  }}
 function updateHint(){let str='أضف ذرات من لوحة العناصر لبدء الاكتشاف.';
  if(atoms.length){if(selected){const atom=atoms.find(a=>a.id===selected);str=`اختر ذرة ثانية ${order===0?'لحذف الرابطة':'لرسم رابطة '+['','مفردة','مزدوجة','ثلاثية'][order]} مع ${ELEMENTS[atom.symbol].name}.`;}else str='المس ذرتين لربطهما، أو اسحب ذرة لتحريكها.';}
- $('#stage-hint').textContent=str;$('#atom-count').textContent=atoms.length;$('#bond-count').textContent=bonds.length;$('#delete-atom').disabled=!selected;$('#selected-info').disabled=!selected;$('#analyze-now').disabled=!atoms.length;$('#undo').disabled=!history.length;}
+ $('#stage-hint').textContent=str;$('#atom-count').textContent=atoms.length;$('#bond-count').textContent=bonds.length;$('#delete-atom').disabled=!selected;$('#selected-info').disabled=!selected;$('#edit-electrons').disabled=!selected;$('#analyze-now').disabled=!atoms.length;$('#undo').disabled=!history.length;}
 function renderResult(){const result=analyze(atoms,bonds);const found=result.kind==='found';const panel=$('#result-display');panel.className='result-display'+(found?' found':result.kind==='overbonded'||result.kind==='invalid'?' problem':result.kind==='unknown'?' unknown':'');
  const visual=$('#result-visual');visual.className='result-visual'+(found?'':' placeholder');visual.textContent=found?result.molecule.formula:(result.kind==='overbonded'?'!':result.kind==='unknown'?'?':result.kind==='empty'?'+':'···');
  $('#result-title').textContent=found?result.molecule.name:result.title;
@@ -168,6 +179,9 @@ function bindEvents(){for(const t of document.querySelectorAll('.bond-tool'))t.a
  $('#prompt-show').addEventListener('click',()=>{if(promptSymbol)showElementFacts(promptSymbol);});
  $('#prompt-dismiss').addEventListener('click',()=>{$('#atom-info-prompt').hidden=true;});
  $('#selected-info').addEventListener('click',()=>{const a=atoms.find(x=>x.id===selected);if(a)showElementFacts(a.symbol);});
+ $('#edit-electrons').addEventListener('click',showElectronEditor);
+ $('#electron-save').addEventListener('click',saveElectronEditor);
+ $('#electron-clear').addEventListener('click',()=>{$('#electron-charge').value='';$('#electron-radicals').value='';saveElectronEditor();});
  $('#analyze-now').addEventListener('click',showStructureReport);
  $('#undo').addEventListener('click',undo);$('#reset-stage').addEventListener('click',clearWorkspace);$('#delete-atom').addEventListener('click',deleteSelected);
  $('#toggle-extra').addEventListener('click',()=>{const n=$('#extra-knowledge');n.hidden=!n.hidden;$('#toggle-extra').textContent=n.hidden?'اقرأ المزيد عن هذا الجزيء ▾':'إخفاء التفاصيل ▴';});
