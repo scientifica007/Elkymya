@@ -3,6 +3,7 @@
    predictive computational chemistry. No dependencies. */
 (function(root) {
   'use strict';
+  const {inspectElectrons}=typeof module==='object'&&module.exports ? require('./electron-model.js') : root.MatterLabElectrons;
   const ELEMENTS = Object.freeze({
     H:  {name:'هيدروجين', number:1,  max:1, tone:'hydrogen',  mass:1.008},
     C:  {name:'كربون',    number:6,  max:4, tone:'carbon',    mass:12.011},
@@ -144,7 +145,13 @@
     if(reached.size!==atoms.length) return {kind:'disconnected',title:'ذرات لم ترتبط بعد',message:'لديك مجموعات منفصلة. اربط الذرات التي تريد إدخالها في جزيء واحد، أو احذف الزائد منها.'};
     const nodes=atoms.map(simplify);
     const known=MOLECULES.find(m=>structureMatches(nodes,edges,m));
-    if(known) return {kind:'found',title:'اكتشاف علمي!',message:known.overview,molecule:known};
+    if(known) {
+      const electronic=inspectElectrons(atoms,bonds);
+      if(electronic.invalid || (electronic.complete && (electronic.netCharge!==0||electronic.totalRadicals!==0))) {
+        return {kind:'electronic-variant',title:'الرسم يشبه جزيئًا معروفًا، لكن توصيف الإلكترونات مختلف',message:'الرسم البنيوي يطابق '+known.name+'، إلا أن الشحنات أو الإلكترونات التي أدخلتها لا تسمح باعتماده النوع الكيميائي نفسه دون تحقق إضافي.',molecule:known};
+      }
+      return {kind:'found',title:'اكتشاف بنية معروفة!',message:known.overview,molecule:known};
+    }
     const valences=Array(atoms.length).fill(0);
     for(const [a,b,o] of edges){valences[a]+=o;valences[b]+=o;}
     const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max);
@@ -157,6 +164,7 @@
   // Report on what was *drawn*. It does not establish quantum stability, charge, or synthetic feasibility.
   function inspectStructure(atoms,bonds) {
     const result=analyze(atoms,bonds);
+    const electronic=inspectElectrons(atoms,bonds);
     const c={}; for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
     const order=['C','H',...Object.keys(c).filter(x=>!['C','H'].includes(x)).sort()];
     const displayDigit=n=>String(n).replace(/[0-9]/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
@@ -175,10 +183,10 @@
     const totalMass=atoms.reduce((v,a)=>v+(ELEMENTS[a.symbol]?.mass||0),0);
     const valenceElectrons={H:1,C:4,N:5,O:6,Cl:7};
     const totalValenceElectrons=atoms.reduce((v,a)=>v+(valenceElectrons[a.symbol]||0),0);
-    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,c,atomCount:atoms.length,bondCount:bonds.length,
+    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,electronic,c,atomCount:atoms.length,bondCount:bonds.length,
       allAtomsKnown:atoms.every(a=>ELEMENTS[a.symbol]), allBondEndsKnown:bonds.every(b=>byId.has(b.a)&&byId.has(b.b))};
   }
-  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure};
+  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure,inspectElectrons};
   if(typeof module==='object'&&module.exports) module.exports=api;
   root.MatterLabEngine=api;
 })(typeof window!=='undefined'?window:globalThis);
