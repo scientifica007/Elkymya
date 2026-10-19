@@ -11,5 +11,5 @@ assert.match(stage, /(?:^|;)touch-action:auto(?:;|$)/, 'Empty stage must delegat
 assert.match(css, /\.stage:before\{[^}]*pointer-events:none(?:;|$)/, 'Decoration must not intercept touch');
 assert.match(atom, /(?:^|;)touch-action:none(?:;|$)/, 'Dragging an atom must retain pointer movement on touch devices');
 assert.match(html, /مرّر الصفحة من فراغ المختبر/, 'Explain gesture boundaries to mobile users');
-assert.match(html, /class="stage-release"[^>]*>v0\.2\.2<\/span>/, 'Show deployed version in mobile editor');
+assert.match(html, /class="stage-release"[^>]*>v0\.3\.0<\/span>/, 'Show deployed version in mobile editor');
 console.log('PASS: editor blank area permits native vertical scrolling while atoms retain touch drag');
