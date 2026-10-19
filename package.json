@@ -7,7 +7,7 @@
     "build": "node scripts/build.mjs",
     "check:bundle": "node scripts/build.mjs --check",
     "check:syntax": "node --check src/engine.js && node --check src/app.js",
-    "test": "node tests/engine.test.js && npm run check:bundle"
+    "test": "node tests/engine.test.js && node tests/mobile_touch.test.mjs && npm run check:bundle"
   },
   "engines": {
     "node": ">=18"
