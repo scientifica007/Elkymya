@@ -12,13 +12,21 @@
 /* Release marker stays visible on phones to distinguish deployed builds; never traps touch. */
 .stage-release{position:absolute;top:10px;left:12px;font:700 10px Arial,sans-serif;color:#60818b;opacity:.7;pointer-events:none;z-index:3;direction:ltr}
 
+/* v0.3 electronic annotation UI. Retains touch-action:auto on stage, none on atoms. */
+.atom-state-mark{position:absolute;right:-13px;top:-10px;min-width:21px;font:700 11px Arial,sans-serif;background:#173f50;color:white;padding:4px 6px;border-radius:12px;text-align:center;pointer-events:none;direction:ltr}
+.electron-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.electron-editor-grid label{font-size:13px;font-weight:700;color:#264c59;display:flex;flex-direction:column;gap:8px}
+.electron-editor-grid select{width:100%;min-height:45px;border:1px solid #cadcde;border-radius:10px;font:inherit;background:#fff;color:#123b4c;padding:8px}
+.electron-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+@media(max-width:650px){.electron-editor-grid{grid-template-columns:1fr}.atom-state-mark{font-size:10px}}
+
 </style>
 </head>
 <body>
 <div class="shell">
 <header class="topbar">
   <div class="brand"><div class="brand-icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44" stroke="currentColor" stroke-width="2"><ellipse cx="22" cy="22" rx="17" ry="7" transform="rotate(52 22 22)"/><ellipse cx="22" cy="22" rx="17" ry="7" transform="rotate(-52 22 22)"/><circle cx="22" cy="22" r="4" fill="currentColor" stroke="none"/></svg></div><div><strong>ذرّة <span style="font-size:12px;color:#66838d">/ MATTER LAB</span></strong><small>مختبر الاكتشاف الكيميائي</small></div></div>
-  <div class="top-actions"><span class="version">نسخة تجريبية 0.2.2</span><button class="btn icon" id="open-help" type="button">؟ كيف ألعب</button><button class="btn primary" id="open-book" type="button"><svg class="svgicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14M4 4h6a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h6z"/></svg> اكتشافاتي</button></div>
+  <div class="top-actions"><span class="version">نسخة تجريبية 0.3.0</span><button class="btn icon" id="open-help" type="button">؟ كيف ألعب</button><button class="btn primary" id="open-book" type="button"><svg class="svgicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14M4 4h6a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h6z"/></svg> اكتشافاتي</button></div>
 </header>
 <section class="hero"><div class="hero-content"><div class="eyebrow">اكتشف • جرّب • تعلّم</div><h1>ماذا يمكنك أن تصنع من الذرات؟</h1><p>اختر ذراتك، جرّب وصلها بطرق مختلفة، واكتشف الجزيئات التي يبنى منها العالم. ليس عليك حفظ الإجابات؛ فقط جرّب!</p></div><div class="hero-side"><div class="hero-stat"><strong id="discoveries-count">0</strong><small>جزيئات اكتشفتها</small></div><div class="hero-sep"></div><div class="hero-stat"><strong id="total-count">18</strong><small>جزيئًا في الموسوعة</small></div></div></section>
 <main class="layout">
@@ -29,8 +37,8 @@
   </div><div class="palette-foot"><strong>هل تعلم؟</strong>كل مربع يمثل نوعًا من الذرات. عدد العناصر المتاحة الآن خمسة فقط؛ سنوسّع الجدول في مراحل لاحقة.</div></aside>
   <section class="card lab" aria-label="مساحة تركيب الجزيئات">
     <div class="lab-head"><div class="lab-title"><h2>مساحة التجريب</h2><p>أنت العالم الصغير. لا توجد وصفة إجبارية.</p></div><span class="scope-pill">● وضع بناء الجزيئات</span></div>
-    <div class="toolbar"><span class="toolbar-label">نوع الرابطة:</span><div class="bond-tools" role="group" aria-label="اختيار نوع الرابطة"><button class="bond-tool current" data-order="1" aria-label="رابطة مفردة" aria-pressed="true" title="مفردة">—</button><button class="bond-tool" data-order="2" aria-label="رابطة مزدوجة" aria-pressed="false" title="مزدوجة">=</button><button class="bond-tool" data-order="3" aria-label="رابطة ثلاثية" aria-pressed="false" title="ثلاثية">≡</button><button class="bond-tool erase" data-order="0" aria-label="حذف رابطة" aria-pressed="false">إزالة</button></div><div class="toolbar-spacer"></div><button class="btn icon" id="selected-info" type="button" disabled>ⓘ معلومات الذرة</button><button class="btn icon" id="delete-atom" type="button" disabled title="اختر ذرة أولًا">حذف ذرة</button><button class="btn icon" id="undo" type="button" disabled title="تراجع (Ctrl+Z)">↶ تراجع</button><button class="btn icon" id="reset-stage" type="button">مسح</button></div>
-    <div class="stage" id="stage"><span class="stage-release" aria-label="إصدار المختبر 0.2.2">v0.2.2</span><svg class="stage-graphic" id="bonds-svg" aria-hidden="true"></svg><div id="atoms-layer"></div><div class="stage-empty" id="empty-state"><div class="empty-ring" aria-hidden="true">⚛</div><strong>مختبرك في انتظار أول ذرة</strong><span>اختر عنصرًا من اللوحة، وأضف ذرات أخرى، ثم المس ذرتين لربطهما.</span></div><div class="stage-tip"><span id="stage-hint" role="status" aria-live="polite">أضف ذرات من لوحة العناصر لبدء الاكتشاف.</span></div></div>
+    <div class="toolbar"><span class="toolbar-label">نوع الرابطة:</span><div class="bond-tools" role="group" aria-label="اختيار نوع الرابطة"><button class="bond-tool current" data-order="1" aria-label="رابطة مفردة" aria-pressed="true" title="مفردة">—</button><button class="bond-tool" data-order="2" aria-label="رابطة مزدوجة" aria-pressed="false" title="مزدوجة">=</button><button class="bond-tool" data-order="3" aria-label="رابطة ثلاثية" aria-pressed="false" title="ثلاثية">≡</button><button class="bond-tool erase" data-order="0" aria-label="حذف رابطة" aria-pressed="false">إزالة</button></div><div class="toolbar-spacer"></div><button class="btn icon" id="selected-info" type="button" disabled>ⓘ معلومات الذرة</button><button class="btn icon" id="edit-electrons" type="button" disabled>⚛ الشحنة والإلكترونات</button><button class="btn icon" id="delete-atom" type="button" disabled title="اختر ذرة أولًا">حذف ذرة</button><button class="btn icon" id="undo" type="button" disabled title="تراجع (Ctrl+Z)">↶ تراجع</button><button class="btn icon" id="reset-stage" type="button">مسح</button></div>
+    <div class="stage" id="stage"><span class="stage-release" aria-label="إصدار المختبر 0.2.2">v0.3.0</span><svg class="stage-graphic" id="bonds-svg" aria-hidden="true"></svg><div id="atoms-layer"></div><div class="stage-empty" id="empty-state"><div class="empty-ring" aria-hidden="true">⚛</div><strong>مختبرك في انتظار أول ذرة</strong><span>اختر عنصرًا من اللوحة، وأضف ذرات أخرى، ثم المس ذرتين لربطهما.</span></div><div class="stage-tip"><span id="stage-hint" role="status" aria-live="polite">أضف ذرات من لوحة العناصر لبدء الاكتشاف.</span></div></div>
     <div class="stage-footer"><span>الذرات: <strong id="atom-count">0</strong> &nbsp;·&nbsp; الروابط: <strong id="bond-count">0</strong></span><span>مرّر الصفحة من فراغ المختبر؛ واسحب الذرة نفسها لتحريكها</span></div>
   </section>
   <aside class="card results"><div class="card-heading"><div class="headericon" aria-hidden="true">✦</div><h2>نتيجة التجربة</h2></div><p class="section-desc">نتفحص البنية التي صنعتها ونخبرك بما نعرفه عنها.</p><div class="state-label" id="status-label" role="status">في انتظار التجربة</div><div class="result-display" id="result-display"><div class="result-visual placeholder" id="result-visual">+</div><h3 id="result-title">مختبرك مستعد</h3><p id="result-message">اختر ذرات من لوحة العناصر، ثم المس ذرتين لربطهما.</p></div><button class="btn explain-button" id="toggle-extra" type="button" hidden>اقرأ المزيد عن هذا الجزيء ▾</button><div class="knowledge-extra" id="extra-knowledge" hidden></div><div class="caution" id="warning" hidden></div><button class="btn primary analyze-button" id="analyze-now" type="button">⌕ حلّل تركيبي بالتفصيل</button><div class="result-bottom" id="result-below">هذا النموذج يفحص بنى جزيئية محددة؛ لا يحاكي التفاعلات أو شروط تكوين المواد بعد.</div><div class="learning-row"><span class="learning-bulb" aria-hidden="true">✧</span><p><strong>فكرة المختبر:</strong> ابدأ بالمحاولة، وتعلّم من النتيجة. التركيب غير المعروف ليس بالضرورة مستحيلًا.</p></div></aside>
@@ -41,15 +49,65 @@
 <div class="overlay" id="encyclopedia" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="book-title"><div class="modal"><div class="modal-head"><div><h2 id="book-title">موسوعة اكتشافاتي</h2><p>كل جزيء تتعرف إليه يضاف هنا.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div class="muted" style="font-size:12px" id="progress-count">0 / 18</div><div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div><div class="discovery-grid" id="discovery-list"></div><div class="modal-info" id="discovery-info" hidden></div><div class="confirm-panel"><p>تُخزن اكتشافاتك على هذا الجهاز فقط، ولا تُرسل إلى خادم.</p><button class="btn reset-button" id="reset-discoveries" type="button">مسح دفتر الاكتشافات</button></div></div></div>
 
 <div class="overlay" id="element-details" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="element-details-title"><div class="modal"><div class="modal-head"><div><h2 id="element-details-title">معلومات العنصر</h2><p>يمكنك الاطلاع أو العودة إلى التجريب مباشرة.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div id="element-details-content"></div></div></div>
+<div class="overlay" id="electrons-editor" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="electron-target"><div class="modal">
+<div class="modal-head"><div><h2 id="electron-target">الشحنة والإلكترونات</h2><p>وصف اختياري لذرة معينة، لا يفرض عليك معرفة الكيمياء للعب.</p></div><button class="close" type="button" aria-label="إغلاق">×</button></div>
+<div class="electron-editor-grid"><label>الشحنة الشكلية<select id="electron-charge"><option value="">غير محددة</option><option value="-2">−2</option><option value="-1">−1</option><option value="0">0</option><option value="1">+1</option><option value="2">+2</option></select></label>
+<label>الإلكترونات غير المزدوجة<select id="electron-radicals"><option value="">غير محددة</option><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></label></div>
+<p class="analysis-small" role="status" id="electron-feedback"></p><p class="analysis-note">هذه الحسابات وفق رسم لويس، ولا تثبت استقرار المادة. الأوزون له رنين، والأكسجين O₂ لا يمثل الرسم البسيط جميع خصائصه الإلكترونية.</p>
+<div class="electron-actions"><button class="btn primary" id="electron-save" type="button">اعتماد الخصائص</button><button class="btn ghost" id="electron-clear" type="button">إلغاء التوصيف</button></div></div></div>
 <div class="overlay" id="structure-report" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="structure-report-title"><div class="modal"><div class="modal-head"><div><h2 id="structure-report-title">تقرير تحليل التركيب</h2><p>نحلل البنية التي رسمتها، ولا نجزم بوجود مادة لم توثّق.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div id="structure-report-content"></div></div></div>
-<div class="overlay" id="help" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="modal"><div class="modal-head"><div><h2 id="help-title">كيف أستعمل مختبر ذرّة؟</h2><p>ثلاث خطوات، ثم ابدأ التجريب بحرية.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div class="tutorial"><div class="tutorial-item"><div class="tutorial-num">١</div><strong>أضف الذرات</strong><div>المس مربع العنصر من لوحة العناصر. تقدر أن تضع عدة ذرات من النوع نفسه.</div></div><div class="tutorial-item"><div class="tutorial-num">٢</div><strong>اختر الرابطة</strong><div>اختر رابطة مفردة (—) أو مزدوجة (=) أو ثلاثية (≡)، ثم المس الذرة الأولى والثانية.</div></div><div class="tutorial-item"><div class="tutorial-num">٣</div><strong>شاهد الاكتشاف</strong><div>إذا تطابقت البنية مع جزيء موثق، تظهر بطاقة تعريف ويُضاف إلى الموسوعة. تستطيع أيضًا فتح تقرير تحليل البنية.</div></div></div><div class="notice"><strong>ملحوظة علمية مهمة:</strong> نحن الآن نبني رسومًا لجزيئات معروفة؛ لم نبدأ محاكاة شروط التفاعل أو قياس الاستقرار الفيزيائي. النماذج غير المدرجة في الموسوعة لا تُحكم بالاستحالة.</div><div class="modal-info"><strong>أدوات إضافية</strong>اسحب أي ذرة لتحريكها. اضغط «ⓘ معلومات» بجانب العنصر لمعرفة تكافؤه المعتاد، أو اضغط «معلومات الذرة» بعد تحديد ذرة في الرسم. اختر «إزالة» والمس طرفي الرابطة المراد حذفها. لحذف ذرة المسها مرة واحدة ثم اضغط «حذف ذرة». للتراجع اضغط «تراجع» أو Ctrl+Z. يمكن استعمال الأزرار 1 و2 و3 لاختيار نوع الرابطة.</div></div></div>
+<div class="overlay" id="help" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="modal"><div class="modal-head"><div><h2 id="help-title">كيف أستعمل مختبر ذرّة؟</h2><p>ثلاث خطوات، ثم ابدأ التجريب بحرية.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div class="tutorial"><div class="tutorial-item"><div class="tutorial-num">١</div><strong>أضف الذرات</strong><div>المس مربع العنصر من لوحة العناصر. تقدر أن تضع عدة ذرات من النوع نفسه.</div></div><div class="tutorial-item"><div class="tutorial-num">٢</div><strong>اختر الرابطة</strong><div>اختر رابطة مفردة (—) أو مزدوجة (=) أو ثلاثية (≡)، ثم المس الذرة الأولى والثانية.</div></div><div class="tutorial-item"><div class="tutorial-num">٣</div><strong>شاهد الاكتشاف</strong><div>إذا تطابقت البنية مع جزيء موثق، تظهر بطاقة تعريف ويُضاف إلى الموسوعة. تستطيع أيضًا فتح تقرير تحليل البنية.</div></div></div><div class="notice"><strong>ملحوظة علمية مهمة:</strong> نحن الآن نبني رسومًا لجزيئات معروفة؛ لم نبدأ محاكاة شروط التفاعل أو قياس الاستقرار الفيزيائي. النماذج غير المدرجة في الموسوعة لا تُحكم بالاستحالة.</div><div class="modal-info"><strong>أدوات إضافية</strong>اسحب أي ذرة لتحريكها. اضغط «ⓘ معلومات» بجانب العنصر لمعرفة تكافؤه المعتاد، أو اضغط «معلومات الذرة» بعد تحديد ذرة في الرسم. اختر «إزالة» والمس طرفي الرابطة المراد حذفها. لحذف ذرة المسها مرة واحدة ثم اضغط «حذف ذرة». للتراجع اضغط «تراجع» أو Ctrl+Z. يمكن استعمال الأزرار 1 و2 و3 لاختيار نوع الرابطة. بعد تحديد ذرة، يمكنك فتح «الشحنة والإلكترونات» لتوصيفها اختيارياً وتقييمها في التقرير.</div></div></div>
 
+<script>
+/* Electron bookkeeping in simple Lewis drawings; not quantum chemistry. */
+(function(root){
+'use strict';
+const VE=Object.freeze({H:1,C:4,N:5,O:6,Cl:7});
+function inspectElectrons(atoms,bonds){
+ const byId=new Map(atoms.map((a,i)=>[a.id,i]));
+ const bondOrders=atoms.map(()=>0);
+ for(const b of bonds){const x=byId.get(b.a),y=byId.get(b.b);if(x===undefined||y===undefined||!Number.isInteger(b.order)||b.order<1||b.order>3)continue;bondOrders[x]+=b.order;bondOrders[y]+=b.order;}
+ const entries=atoms.map((a,i)=>{
+  const charge=a.formalCharge,radicals=a.unpairedElectrons;
+  const chargeSet=Number.isInteger(charge),radicalsSet=Number.isInteger(radicals);
+  const provided=chargeSet||radicalsSet;
+  const out={id:a.id,symbol:a.symbol,used:bondOrders[i],provided,charge:chargeSet?charge:null,radicals:radicalsSet?radicals:null,lonePairs:null,shell:null,state:provided?'incomplete':'unassigned',reason:''};
+  if(!provided)return out;
+  if(!chargeSet||!radicalsSet){out.reason='حدد الشحنة الشكلية وعدد الإلكترونات غير المزدوجة معًا.';return out;}
+  if(!Object.hasOwn(VE,a.symbol)||charge < -2||charge>2||radicals<0||radicals>2){out.state='invalid';out.reason='القيم خارج نطاق النموذج التعليمي.';return out;}
+  const nonbonding=VE[a.symbol]-charge-bondOrders[i]-radicals;
+  if(nonbonding<0||nonbonding%2!==0){out.state='invalid';out.reason='لا يمكن توزيع الإلكترونات المتبقية إلى أزواج حرة وفق القيم المختارة.';return out;}
+  out.lonePairs=nonbonding/2;
+  out.shell=2*bondOrders[i]+nonbonding+radicals;
+  const maxShell=a.symbol==='H'?2:(a.symbol==='Cl'?Number.POSITIVE_INFINITY:8);
+  if(out.shell>maxShell){out.state='invalid';out.reason='يتجاوز غلاف التكافؤ الحدود التي يمثلها هذا النموذج لهذا العنصر.';return out;}
+  out.state='consistent';out.reason='العد الإلكتروني متسق في رسم لويس المبسط؛ لا يثبت الاستقرار.';return out;
+ });
+ const assigned=entries.filter(x=>x.provided).length;
+ const invalid=entries.some(x=>x.state==='invalid');
+ const partial=entries.some(x=>x.state==='incomplete');
+ const complete=atoms.length>0&&assigned===atoms.length&&!invalid&&!partial;
+ const netCharge=complete?entries.reduce((s,a)=>s+a.charge,0):null;
+ const totalRadicals=complete?entries.reduce((s,a)=>s+a.radicals,0):null;
+ const totalValence=atoms.reduce((s,a)=>s+(VE[a.symbol]||0),0);
+ // Charge is not known unless every atom has a consistent explicit state.
+ return {entries,assigned,complete,invalid,partial,netCharge,totalRadicals,totalValence,
+    totalElectrons:complete?totalValence-netCharge:null,
+    status:invalid?'inconsistent':complete?'specified':assigned?'partial':'unassigned'};
+}
+const api={inspectElectrons,VALENCE_ELECTRONS:VE};
+if(typeof module==='object'&&module.exports)module.exports=api;
+root.MatterLabElectrons=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
 <script>
 /* Matter Lab v0.1 — graph-based molecular structure checker.
    Scope: educational covalent structures, not reaction simulation or
    predictive computational chemistry. No dependencies. */
 (function(root) {
   'use strict';
+  const {inspectElectrons}=typeof module==='object'&&module.exports ? require('./electron-model.js') : root.MatterLabElectrons;
   const ELEMENTS = Object.freeze({
     H:  {name:'هيدروجين', number:1,  max:1, tone:'hydrogen',  mass:1.008},
     C:  {name:'كربون',    number:6,  max:4, tone:'carbon',    mass:12.011},
@@ -189,12 +247,19 @@
     const reached=new Set([0]);const queue=[0];
     while(queue.length) for(const v of adj[queue.shift()]) if(!reached.has(v)){reached.add(v);queue.push(v);}
     if(reached.size!==atoms.length) return {kind:'disconnected',title:'ذرات لم ترتبط بعد',message:'لديك مجموعات منفصلة. اربط الذرات التي تريد إدخالها في جزيء واحد، أو احذف الزائد منها.'};
+    const electronic=inspectElectrons(atoms,bonds);
     const nodes=atoms.map(simplify);
     const known=MOLECULES.find(m=>structureMatches(nodes,edges,m));
-    if(known) return {kind:'found',title:'اكتشاف علمي!',message:known.overview,molecule:known};
+    if(known) {
+      if(electronic.invalid || (electronic.complete && (electronic.netCharge!==0||electronic.totalRadicals!==0))) {
+        return {kind:'electronic-variant',title:'الرسم يشبه جزيئًا معروفًا، لكن توصيف الإلكترونات مختلف',message:'الرسم البنيوي يطابق '+known.name+'، إلا أن الشحنات أو الإلكترونات التي أدخلتها لا تسمح باعتماده النوع الكيميائي نفسه دون تحقق إضافي.',molecule:known};
+      }
+      return {kind:'found',title:'اكتشاف بنية معروفة!',message:known.overview,molecule:known};
+    }
+    if(electronic.invalid) return {kind:'electronic-inconsistent',title:'التوصيف الإلكتروني يحتاج مراجعة',message:'هناك قيم للشحنة أو الإلكترونات غير المزدوجة لا تتوافق حسابيًا مع الروابط المرسومة في نموذج لويس. راجعها في تقرير التركيب.'};
     const valences=Array(atoms.length).fill(0);
     for(const [a,b,o] of edges){valences[a]+=o;valences[b]+=o;}
-    const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max);
+    const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max && electronic.entries[i].state!=='consistent');
     if(excess) return {kind:'overbonded',title:'الروابط تحتاج مراجعة',message:`في النموذج المبسط الحالي، لا تتوافق هذه الروابط مع التكافؤ المعتاد لعنصر ${describeAtom(excess)}. جرّب تقليل رتبة رابطة أو تغيير التركيب. بعض الجزيئات الحقيقية تتطلب قواعد أكثر تقدمًا.`};
     const pending=atoms.filter((a,i)=>valences[i]<ELEMENTS[a.symbol].max);
     if(pending.length) return {kind:'building',title:'قد يكون الجزيء غير مكتمل',message:'جرّب إضافة ذرات أو تعديل الروابط. هذه إشارة وفق قاعدة التكافؤ المبسطة، وليست حكمًا نهائيًا على إمكان وجود المادة.'};
@@ -204,6 +269,7 @@
   // Report on what was *drawn*. It does not establish quantum stability, charge, or synthetic feasibility.
   function inspectStructure(atoms,bonds) {
     const result=analyze(atoms,bonds);
+    const electronic=inspectElectrons(atoms,bonds);
     const c={}; for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
     const order=['C','H',...Object.keys(c).filter(x=>!['C','H'].includes(x)).sort()];
     const displayDigit=n=>String(n).replace(/[0-9]/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
@@ -222,10 +288,10 @@
     const totalMass=atoms.reduce((v,a)=>v+(ELEMENTS[a.symbol]?.mass||0),0);
     const valenceElectrons={H:1,C:4,N:5,O:6,Cl:7};
     const totalValenceElectrons=atoms.reduce((v,a)=>v+(valenceElectrons[a.symbol]||0),0);
-    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,c,atomCount:atoms.length,bondCount:bonds.length,
+    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,electronic,c,atomCount:atoms.length,bondCount:bonds.length,
       allAtomsKnown:atoms.every(a=>ELEMENTS[a.symbol]), allBondEndsKnown:bonds.every(b=>byId.has(b.a)&&byId.has(b.b))};
   }
-  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure};
+  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure,inspectElectrons};
   if(typeof module==='object'&&module.exports) module.exports=api;
   root.MatterLabEngine=api;
 })(typeof window!=='undefined'?window:globalThis);
@@ -252,25 +318,11 @@ const ELEMENT_FACTS={
 };
 // Nature and industrial preparation are independent properties, never exclusive categories.
 // Curated educational notes only; missing statements are not evidence of non-existence.
-const OCCURRENCE={
- h2:['موجود طبيعيًا في النجوم ووسط الكون.','يُنتَج صناعيًا.'],
- o2:['يوجد طبيعيًا في الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
- n2:['يشكل معظم الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
- cl2:[null,'يُنتَج صناعيًا، وهو غاز سام.'],
- hcl:['يوجد في بعض الغازات البركانية.','يُنتَج صناعيًا.'],
- water:['يوجد طبيعيًا في البحار والأنهار والسحب والكائنات الحية.','يمكن إنتاجه أو استخلاصه ومعالجته صناعيًا.'],
- ozone:['يوجد طبيعيًا في الغلاف الجوي.','يمكن إنتاجه بواسطة أجهزة توليد الأوزون.'],
- co2:['يوجد طبيعيًا في الهواء وينتج عن تنفس الكائنات الحية.','يُنتَج أو يُستخلص صناعيًا.'],
- methane:['يوجد في الغاز الطبيعي وبيئات حيوية معينة.','يمكن إنتاجه صناعيًا.'],
- ammonia:['يوجد بكميات صغيرة في الطبيعة.','يُنتَج صناعيًا لإنتاج الأسمدة.'],
- peroxide:['قد يتكون بكميات صغيرة في عمليات طبيعية.','يُنتَج صناعيًا.'],
- formaldehyde:['قد يتكوّن في عمليات طبيعية وحيوية.','يُنتَج صناعيًا.'],
- ethane:['يوجد في الغاز الطبيعي.','يُفصل ضمن العمليات الصناعية لمعالجة الغاز.'],
- ethene:['تُنتجه النباتات، ويشارك في نضج بعض الثمار.','يُنتَج صناعيًا لإنتاج البوليمرات.'],
- ethyne:[null,'يُنتَج صناعيًا.'],
- methanol:['يوجد بكميات ضئيلة في مصادر طبيعية.','يُنتَج صناعيًا، وهو سام.'],
- ethanol:['يمكن أن ينشأ طبيعيًا بفعل التخمر.','يُنتَج صناعيًا لأغراض عديدة.'],
- dme:[null,'يُنتَج صناعيًا.']
+/* Evidence-curated subset: missing metadata is unknown, not proof of absence. */
+const EVIDENCE={
+ water:{natural:{note:'يوجد الماء في البحار والأنهار والأمطار والكائنات الحية.',url:'https://pubchem.ncbi.nlm.nih.gov/compound/Water',source:'PubChem — Water (CID 962)'}},
+ ozone:{natural:{note:'يوجد الأوزون طبيعيًا في الغلاف الجوي، بما في ذلك الستراتوسفير.',url:'https://www.epa.gov/ground-level-ozone-pollution/ground-level-ozone-basics',source:'US EPA — Ozone Basics'},
+ industrial:{note:'يمكن تحضير الأوزون صناعيًا واستخدامه في معالجة المياه.',url:'https://pubchem.ncbi.nlm.nih.gov/compound/Ozone',source:'PubChem — Ozone (CID 24823)'}}
 };
 let promptedFor=new Set(),promptSymbol=null;
 function infoPrompt(symbol){
@@ -290,6 +342,23 @@ function showElementFacts(symbol){
  <div class="analysis-note">${htmlEscape(fact.note)}</div><p class="analysis-small">هذه أمثلة تعليمية للروابط التساهمية. القاعدة المبسطة ليست حدًا مطلقًا، ولا تثبت وحدها وجود مادة أو استقرارها.</p>`;
  showModal('element-details');
 }
+function showElectronEditor(){
+ const a=atoms.find(x=>x.id===selected);if(!a)return;
+ $('#electron-target').textContent='ذرة '+ELEMENTS[a.symbol].name+' — '+a.symbol;
+ $('#electron-charge').value=Number.isInteger(a.formalCharge)?String(a.formalCharge):'';
+ $('#electron-radicals').value=Number.isInteger(a.unpairedElectrons)?String(a.unpairedElectrons):'';
+ $('#electron-feedback').textContent='اترك القيم فارغة إذا لم ترغب بتوصيف إلكتروني.';
+ showModal('electrons-editor');
+}
+function saveElectronEditor(){
+ const a=atoms.find(x=>x.id===selected);if(!a)return;
+ const ch=$('#electron-charge').value,ra=$('#electron-radicals').value;
+ if((ch==='')!==(ra==='')){$('#electron-feedback').textContent='حدد كلا الحقلين أو اتركهما فارغين.';return;}
+ pushUndo();
+ if(ch===''){delete a.formalCharge;delete a.unpairedElectrons;}
+ else{a.formalCharge=Number(ch);a.unpairedElectrons=Number(ra);}
+ closeModal('electrons-editor');render();
+}
 function showStructureReport(){
  const info=inspectStructure(atoms,bonds),out=$('#structure-report-content'),res=info.result;
  if(!atoms.length){out.innerHTML='<div class="analysis-note">لم تضف أي ذرات بعد. أضف ذرتين على الأقل وجرّب ربطهما.</div>';showModal('structure-report');return;}
@@ -297,9 +366,12 @@ function showStructureReport(){
  let verdict='',type='',occ='';
  if(known){
   verdict=`<div class="analysis-note analysis-ok"><strong>بنية موثقة: ${htmlEscape(res.molecule.name)}</strong><div>${htmlEscape(res.molecule.overview)}</div><div>${htmlEscape(res.molecule.extra)}</div></div>`;
-  const [natural,industrial]=OCCURRENCE[res.molecule.id]||[null,null];
-  occ=`<h3 class="analysis-section-title">هل توجد في الطبيعة؟ وهل تُنتَج صناعيًا؟</h3>
-   <div class="analysis-grid"><div class="analysis-tile"><strong>الوجود في الطبيعة</strong>${htmlEscape(natural||'لم نراجع هذه المعلومة لهذا الجزيء بعد؛ لا يعني ذلك عدم وجوده في الطبيعة.')}</div><div class="analysis-tile"><strong>التحضير أو الإنتاج الصناعي</strong>${htmlEscape(industrial||'لم نراجع هذه المعلومة لهذا الجزيء بعد.')}</div></div>`;
+  const source=EVIDENCE[res.molecule.id]||{};
+  const cell=item=>item?htmlEscape(item.note)+'<p class="analysis-small"><a class="analysis-link" href="'+htmlEscape(item.url)+'" target="_blank" rel="noopener noreferrer">المصدر: '+htmlEscape(item.source)+'</a></p>':'لم تُراجع هذه المعلومة بعد؛ غياب التوثيق هنا ليس دليلًا على عدم الوجود.';
+  occ=`<h3 class="analysis-section-title">الوجود الطبيعي والتحضير الصناعي (بحسب السجلات الموثقة)</h3><div class="analysis-grid"><div class="analysis-tile"><strong>في الطبيعة</strong>${cell(source.natural)}</div><div class="analysis-tile"><strong>صناعيًا</strong>${cell(source.industrial)}</div></div>`;
+ }else if(res.kind==='electronic-variant'){
+  verdict=`<div class="analysis-note"><strong>البنية تشبه ${htmlEscape(res.molecule.name)} لكنها إلكترونيًا ليست مؤكدة النوع نفسه.</strong><div>${htmlEscape(res.message)}</div></div>`;
+
  }else if(res.kind==='overbonded'){
   verdict=`<div class="analysis-note"><strong>تعارض مع قاعدة التكافؤ التعليمية</strong><div>${htmlEscape(res.message)}</div>هذا لا يثبت الاستحالة النظرية؛ فالشحنات والحالات الإلكترونية والجذور غير ممثلة هنا.</div>`;
  }else if(res.kind==='building'||res.kind==='disconnected'){
@@ -313,10 +385,14 @@ function showStructureReport(){
  const matches=MOLECULES.filter(m=>{const t={};m.nodes.forEach(s=>t[s]=(t[s]||0)+1);return Object.keys(t).length===Object.keys(c).length && Object.entries(c).every(([k,v])=>t[k]===v)});
  const same=(!known&&matches.length)?`<div class="analysis-note">وجدنا جزيئات معروفة لها <strong>عدد الذرات نفسه</strong> في موسوعتنا، لكن ذلك لا يعني تطابق بنيتها مع رسمك: ${matches.map(m=>htmlEscape(m.name)).join('، ')}.</div>`:'';
  const electronNote=(info.totalValenceElectrons%2===1)?`<div class="analysis-note"><strong>ملاحظة إلكترونية إضافية:</strong> مجموع إلكترونات التكافؤ للذرات المرسومة هو ${info.totalValenceElectrons} (عدد فردي). إذا كان النوع الكيميائي متعادل الشحنة، فلن تكون كل إلكتروناته مزدوجة؛ لذلك لا يمكن التعامل معه باعتباره جزيئًا متعادلًا مغلق الغلاف الإلكتروني. قد يكون جذرًا أو يتطلب وصفًا مختلفًا، ولا نستنتج استقراره من ذلك.</div>`:'';
+ const e=info.electronic;
+ const eMessage=e.complete?'إدخالاتك متسقة حسابيًا؛ مجموع الشحنات الشكلية: '+e.netCharge+'، والإلكترونات غير المزدوجة المسجلة: '+e.totalRadicals+'.':e.invalid?'بعض الإدخالات لا تسمح بتوزيع إلكترونات متسق في هذا النموذج؛ راجع الذرات المحددة.':e.assigned?'لم تصف جميع الذرات إلكترونيًا؛ لا يمكن حساب الشحنة الإجمالية بعد.':'لم تحدد أي شحنات شكلية أو إلكترونات منفردة؛ التحليل بنيوي فقط.';
+ const electronicRows=e.entries.map((a,i)=>`<tr><td>${i+1}</td><td dir="ltr">${htmlEscape(a.symbol)}</td><td>${a.charge===null?'—':a.charge}</td><td>${a.radicals===null?'—':a.radicals}</td><td>${a.lonePairs===null?'—':a.lonePairs}</td><td>${htmlEscape(a.reason||'غير محدد')}</td></tr>`).join('');
+ const electronicPanel=`<h3 class="analysis-section-title">الشحنات والإلكترونات (نموذج لويس)</h3><div class="analysis-note">${htmlEscape(eMessage)} هذا فحص حسابي وليس دليلًا على استقرار المادة.</div><div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>ذرة</th><th>رمز</th><th>الشحنة الشكلية</th><th>منفردة</th><th>أزواج حرة</th><th>التفسير</th></tr></thead><tbody>${electronicRows}</tbody></table></div>`;
  const caution=known&&res.molecule.caution?`<div class="analysis-note">${htmlEscape(res.molecule.caution)}</div>`:'';
  out.innerHTML=`<div class="analysis-summary"><span class="analysis-small">الصيغة المحسوبة بعدّ الذرات</span><span class="formula">${htmlEscape(info.formula)}</span><div class="analysis-small">${type}</div></div>
  <div class="analysis-grid"><div class="analysis-tile"><strong>عدد الذرات</strong>${info.atomCount} ذرة · مجموع الكتل الذرية ${info.totalMass.toFixed(3)} u تقريبًا</div><div class="analysis-tile"><strong>عدد الروابط المرسومة</strong>${info.bondCount} رابطة (مفردة: ${info.edgeCounts.single}، مزدوجة: ${info.edgeCounts.double}، ثلاثية: ${info.edgeCounts.triple})</div></div>
- ${verdict}${electronNote}${same}${occ}<h3 class="analysis-section-title">فحص كل ذرة</h3>
+ ${verdict}${electronNote}${same}${occ}${electronicPanel}<h3 class="analysis-section-title">فحص كل ذرة</h3>
  <div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>رقم</th><th>عنصر</th><th>وصلات</th><th>مجموع رتبها</th><th>المعتاد</th><th>الملاحظة</th></tr></thead><tbody>${atomRows}</tbody></table></div>
  ${caution}<div class="analysis-note">حدود التحليل: لا يمثل هذا الإصدار الشحنة الشكلية ولا الإلكترونات الحرة أو الرنين بصورة كاملة، ولا يقدّر الاستقرار بالطاقة الكمّية أو إمكانية التصنيع. إن وصف «غير موجود في الفهرس» ليس حكمًا باستحالة وجوده.</div>
  <p class="analysis-small">للتوسع: <a class="analysis-link" href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubChem</a> وقاموس <a class="analysis-link" href="https://goldbook.iupac.org/" target="_blank" rel="noopener noreferrer">IUPAC</a> (تحتاج المواقع الخارجية إلى اتصال بالإنترنت).</p>`;
@@ -354,6 +430,7 @@ function createPalette(){const palette=$('#palette');for(const [symbol,info] of 
 function renderStage(){const field=$('#stage'),layer=$('#atoms-layer');layer.innerHTML='';
  $('#empty-state').hidden=atoms.length>0;
  for(const atom of atoms){const btn=el('button','stage-atom '+ELEMENTS[atom.symbol].tone+(selected===atom.id?' selected':''),atom.symbol);btn.type='button';btn.dataset.atomId=atom.id;btn.title=ELEMENTS[atom.symbol].name+' — اسحب لتحريكه، أو المس لربطه';btn.setAttribute('aria-label','ذرة '+ELEMENTS[atom.symbol].name);btn.style.left=(atom.x*100)+'%';btn.style.top=(atom.y*100)+'%';
+ if(Number.isInteger(atom.formalCharge)&&Number.isInteger(atom.unpairedElectrons)){const mark=el('span','atom-state-mark',(atom.formalCharge>0?'+'+atom.formalCharge:atom.formalCharge)+ (atom.unpairedElectrons?' •'+atom.unpairedElectrons:''));btn.append(mark);}
  btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();let dragging=false;const sx=e.clientX,sy=e.clientY,originX=atom.x,originY=atom.y;let snapshotTaken=false;
  btn.setPointerCapture(e.pointerId);
  const move=evt=>{if(!dragging&&Math.hypot(evt.clientX-sx,evt.clientY-sy)>7)dragging=true;if(!dragging)return;
@@ -377,7 +454,7 @@ function drawBonds(){const svg=$('#bonds-svg'),area=$('#stage'),r=area.getBoundi
  }}
 function updateHint(){let str='أضف ذرات من لوحة العناصر لبدء الاكتشاف.';
  if(atoms.length){if(selected){const atom=atoms.find(a=>a.id===selected);str=`اختر ذرة ثانية ${order===0?'لحذف الرابطة':'لرسم رابطة '+['','مفردة','مزدوجة','ثلاثية'][order]} مع ${ELEMENTS[atom.symbol].name}.`;}else str='المس ذرتين لربطهما، أو اسحب ذرة لتحريكها.';}
- $('#stage-hint').textContent=str;$('#atom-count').textContent=atoms.length;$('#bond-count').textContent=bonds.length;$('#delete-atom').disabled=!selected;$('#selected-info').disabled=!selected;$('#analyze-now').disabled=!atoms.length;$('#undo').disabled=!history.length;}
+ $('#stage-hint').textContent=str;$('#atom-count').textContent=atoms.length;$('#bond-count').textContent=bonds.length;$('#delete-atom').disabled=!selected;$('#selected-info').disabled=!selected;$('#edit-electrons').disabled=!selected;$('#analyze-now').disabled=!atoms.length;$('#undo').disabled=!history.length;}
 function renderResult(){const result=analyze(atoms,bonds);const found=result.kind==='found';const panel=$('#result-display');panel.className='result-display'+(found?' found':result.kind==='overbonded'||result.kind==='invalid'?' problem':result.kind==='unknown'?' unknown':'');
  const visual=$('#result-visual');visual.className='result-visual'+(found?'':' placeholder');visual.textContent=found?result.molecule.formula:(result.kind==='overbonded'?'!':result.kind==='unknown'?'?':result.kind==='empty'?'+':'···');
  $('#result-title').textContent=found?result.molecule.name:result.title;
@@ -402,6 +479,9 @@ function bindEvents(){for(const t of document.querySelectorAll('.bond-tool'))t.a
  $('#prompt-show').addEventListener('click',()=>{if(promptSymbol)showElementFacts(promptSymbol);});
  $('#prompt-dismiss').addEventListener('click',()=>{$('#atom-info-prompt').hidden=true;});
  $('#selected-info').addEventListener('click',()=>{const a=atoms.find(x=>x.id===selected);if(a)showElementFacts(a.symbol);});
+ $('#edit-electrons').addEventListener('click',showElectronEditor);
+ $('#electron-save').addEventListener('click',saveElectronEditor);
+ $('#electron-clear').addEventListener('click',()=>{$('#electron-charge').value='';$('#electron-radicals').value='';saveElectronEditor();});
  $('#analyze-now').addEventListener('click',showStructureReport);
  $('#undo').addEventListener('click',undo);$('#reset-stage').addEventListener('click',clearWorkspace);$('#delete-atom').addEventListener('click',deleteSelected);
  $('#toggle-extra').addEventListener('click',()=>{const n=$('#extra-knowledge');n.hidden=!n.hidden;$('#toggle-extra').textContent=n.hidden?'اقرأ المزيد عن هذا الجزيء ▾':'إخفاء التفاصيل ▴';});
