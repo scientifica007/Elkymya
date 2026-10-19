@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#10364b"><meta name="description" content="مختبر ذرّة: لعبة تعليمية لبناء الجزيئات واكتشاف الكيمياء بالتجريب الحر."><title>ذرّة — مختبر الاكتشاف الكيميائي</title>
+<style>
+:root {font-family:Tahoma,'Noto Sans Arabic','Segoe UI',Arial,sans-serif;color:#172b3e;background:#eff3f6;font-synthesis:none;--navy:#10283d;--ink:#142e42;--muted:#6c7d8b;--line:#e4eaef;--mint:#127c74;--mintp:#dbf5ed;--orange:#efb966;--white:#fff}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;min-height:100vh}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #efae47;outline-offset:3px}button:disabled{cursor:not-allowed;opacity:.45}body:before{content:'';position:fixed;z-index:-1;inset:0;background:radial-gradient(ellipse at 80% 1%,#d8ecf0 0,transparent 35%),radial-gradient(ellipse at 2% 100%,#ede6db 0,transparent 38%)}.shell{max-width:1540px;margin:auto;padding:24px 28px 42px}.topbar{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:19px}.brand{display:flex;align-items:center;gap:12px}.brand-icon{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:#102b40;color:#f1b963;box-shadow:0 8px 22px #16364b26}.brand-icon svg{width:32px;height:32px}.brand strong{display:block;font-size:25px;line-height:1.3;letter-spacing:-.3px}.brand small{display:block;color:#738491;font-size:12px;margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.version{font-size:12px;color:#547386;background:#dfe8ee;border-radius:999px;padding:7px 11px}.btn{border:1px solid #d9e3e9;background:white;color:#253e50;border-radius:12px;padding:11px 13px;font-size:13px;font-weight:700;display:inline-flex;justify-content:center;align-items:center;gap:8px;transition:transform .16s,background .16s,border-color .16s;min-height:42px}.btn:hover:not(:disabled){border-color:#9acac5;background:#f6fbf9;transform:translateY(-1px)}.btn.primary{background:#176f69;color:#fff;border-color:#176f69}.btn.primary:hover{background:#115f59}.btn.ghost{background:#f4f7f9}.btn.icon{padding:10px 13px}.btn .svgicon{height:17px;width:17px}.hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;background:linear-gradient(108deg,#10364b,#153c4e 60%,#1b5d61);padding:23px 29px;border-radius:24px;color:white;box-shadow:0 15px 35px #153c4b1b;margin-bottom:20px;position:relative;overflow:hidden}.hero:after,.hero:before{content:'';position:absolute;border:1px solid #ffffff1a;border-radius:50%;width:285px;height:285px;left:24%;top:-180px;transform:rotate(-35deg)}.hero:after{width:450px;height:140px;left:40%;top:2px}.hero-content{z-index:1}.hero .eyebrow{font-size:11px;letter-spacing:1.4px;color:#8de6d0;font-weight:800}.hero h1{font-size:25px;font-weight:800;margin:9px 0 8px;line-height:1.4}.hero p{font-size:13px;color:#c4dae1;margin:0;line-height:1.9;max-width:620px}.hero-side{display:flex;gap:18px;align-items:center;z-index:1}.hero-stat{text-align:center;min-width:90px}.hero-stat strong{font-size:31px;line-height:1.3;display:block}.hero-stat small{display:block;font-size:11px;color:#b8d4d8}.hero-sep{height:36px;width:1px;background:#ffffff2d}.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:17px;align-items:start;direction:rtl}.card{background:white;border:1px solid #e4e9ee;border-radius:21px;box-shadow:0 9px 28px #2a40520c;min-width:0}.palette,.results{padding:20px 17px}.card-heading{display:flex;align-items:center;gap:9px;margin:1px 0 8px}.card-heading .headericon{height:35px;width:35px;border-radius:11px;display:grid;place-items:center;background:#e7f6f2;color:#197a70}.card-heading h2{font-size:16px;margin:0;line-height:1.45}.section-desc{font-size:12px;color:#7a8a96;line-height:1.8;margin:0 0 17px}.atom-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.element-tile{position:relative;border:1px solid transparent;text-align:right;min-height:107px;padding:9px 11px 8px;border-radius:13px;background:var(--light);color:var(--dark);display:flex;flex-direction:column;justify-content:space-between;transition:transform .16s,box-shadow .16s}.element-tile:hover{transform:translateY(-2px);box-shadow:0 7px 15px #203d5520}.element-tile .atomic-number{font-size:10px;opacity:.7}.element-tile .symbol{font-family:Arial,sans-serif;font-size:31px;font-weight:800;line-height:1}.element-tile .name{font-size:10px;font-weight:700}.element-tile:after{content:'+';font-family:Arial,sans-serif;font-size:19px;position:absolute;left:9px;top:7px;opacity:.6}.element-tile.hydrogen,.stage-atom.hydrogen{--light:#e6f0fa;--dark:#285b8e;--atom:#d6e8ff;--atom-edge:#9ac1eb}.element-tile.oxygen,.stage-atom.oxygen{--light:#fde9e9;--dark:#ac3647;--atom:#ff8c9d;--atom-edge:#e65c76}.element-tile.carbon,.stage-atom.carbon{--light:#edf0f3;--dark:#3d5263;--atom:#728596;--atom-edge:#4c6678}.element-tile.nitrogen,.stage-atom.nitrogen{--light:#eeeafa;--dark:#6452b2;--atom:#a595ec;--atom-edge:#7a68c9}.element-tile.chlorine,.stage-atom.chlorine{--light:#e8f5e7;--dark:#378546;--atom:#81d39a;--atom-edge:#4ba968}.palette-foot{margin-top:16px;padding:13px 12px;background:#f5f8fa;border-radius:13px;border:1px solid #edf1f3;font-size:11.5px;line-height:1.9;color:#607382}.palette-foot strong{display:block;color:#314d60;margin-bottom:3px}.lab{overflow:hidden}.lab-head{padding:20px 21px 12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.lab-title h2{font-size:17px;margin:0 0 5px}.lab-title p{font-size:11px;color:#82939f;margin:0}.scope-pill{border:1px solid #d2e9e2;background:#f1fbf8;border-radius:40px;padding:7px 10px;color:#137c70;font-size:11px;font-weight:700;white-space:nowrap}.toolbar{padding:0 19px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.toolbar-label{font-size:11px;color:#657d8c;margin-inline-start:1px}.bond-tools{display:inline-flex;background:#eff4f7;border-radius:12px;padding:4px;gap:3px}.bond-tool{font:800 17px Arial,sans-serif;background:transparent;border:0;border-radius:9px;color:#617887;min-width:36px;height:33px;display:grid;place-items:center}.bond-tool.current{background:white;color:#136d65;box-shadow:0 2px 7px #29465b1c}.bond-tool.erase{font:700 11px Tahoma,Arial,sans-serif;min-width:50px}.toolbar-spacer{flex:1}.stage{height:465px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 51% 50%,#fafdff 3%,#f2f8fa 95%);border-top:1px solid #f1f5f7;border-bottom:1px solid #e8eff2;touch-action:none}.stage:before{content:'';position:absolute;inset:0;background-image:radial-gradient(#b6c7d233 .9px,transparent .9px);background-size:24px 24px}.stage-graphic{position:absolute;width:100%;height:100%;inset:0;pointer-events:none;overflow:visible}.stage-atom{position:absolute;display:grid;place-items:center;transform:translate(-50%,-50%);height:66px;width:66px;z-index:2;border-radius:50%;border:3px solid var(--atom-edge);color:#fff;background:radial-gradient(circle at 30% 23%,#ffffff80,var(--atom) 45%,var(--atom-edge) 100%);font:bold 26px Arial,sans-serif;box-shadow:0 8px 16px #2b4d6c30,inset 0 -6px 12px #0000000c;text-shadow:0 1px 2px #0004;user-select:none;touch-action:none;transition:box-shadow .12s,border-color .12s}.stage-atom.hydrogen{color:#2e648e;text-shadow:none}.stage-atom.selected{outline:4px solid #e5ae45;outline-offset:5px;box-shadow:0 5px 25px #e1b65b80}.stage-atom:active{cursor:grabbing}.stage-empty{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8797a4;gap:11px;padding:20px}.stage-empty .empty-ring{border:2px dashed #cadbe1;border-radius:50%;width:116px;height:116px;display:grid;place-items:center;color:#90aeb9;font-size:46px;font-weight:400;position:relative}.stage-empty .empty-ring:before{content:'+';position:absolute;bottom:9px;right:8px;border-radius:50%;background:#d8eee9;color:#2a8a7e;width:27px;height:27px;font:bold 21px Arial;line-height:27px}.stage-empty strong{font-size:15px;color:#526e7c}.stage-empty span{font-size:12px;max-width:250px;line-height:1.9}.stage-tip{position:absolute;bottom:14px;right:14px;left:14px;display:flex;justify-content:center;pointer-events:none}.stage-tip span{display:inline-block;color:#5a7180;font-size:11px;border:1px solid #dce8ee;background:#ffffffeb;padding:8px 13px;border-radius:100px;text-align:center;max-width:100%}.stage-footer{padding:13px 20px;display:flex;justify-content:space-between;gap:10px;align-items:center;color:#6c8290;font-size:11px}.stage-footer strong{color:#2d6f6b;font-size:12px}.results .state-label{font-size:11px;font-weight:800;color:#14776d;background:#e3f5ef;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:30px}.result-display{margin-top:16px;padding:18px 13px;background:#f6f9fa;border:1px solid #edf1f4;border-radius:16px;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px}.result-visual{font:bold 45px Arial,sans-serif;color:#196c69;line-height:1.1;direction:ltr}.result-visual.placeholder{height:53px;width:53px;border:1.5px dashed #bfd8db;border-radius:18px;display:grid;place-items:center;font:28px Arial;color:#84adb6}.result-display h3{font-size:16px;margin:3px 0 0}.result-display p{font-size:12px;line-height:1.9;color:#647b87;margin:0}.result-display.found{background:linear-gradient(145deg,#ecfbf3,#f3faf9);border-color:#c7e9dd}.result-display.problem{background:#fff9f1;border-color:#f3e5d2}.result-display.unknown{background:#f4f4fc;border-color:#e5e5f6}.knowledge-extra{font-size:12px;line-height:2;color:#445f6e;background:#f6f9fa;border-radius:12px;padding:12px;margin:12px 0 0;border:1px solid #edf0f2}.caution{background:#fff7e9;border:1px solid #f0ddae;color:#7b5a18;padding:9px 11px;border-radius:10px;margin-top:10px;font-size:11px;line-height:1.9}.explain-button{width:100%;margin-top:11px}.result-bottom{font-size:11px;line-height:1.8;color:#778b99;padding:14px 4px 0}.result-bottom strong{color:#425d6d}.learning-row{display:flex;align-items:center;gap:10px;margin-top:16px;padding:13px;background:#fff9ef;border:1px solid #f2e3c8;border-radius:14px}.learning-bulb{font-size:22px}.learning-row p{margin:0;font-size:11px;color:#77623b;line-height:1.9}.footer{font-size:11px;text-align:center;color:#758b97;margin-top:21px;line-height:1.9}.toast{position:fixed;z-index:20;left:50%;bottom:25px;transform:translate(-50%,20px);width:min(430px,calc(100vw - 30px));background:#153849;color:#fff;padding:14px 16px;border-radius:16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 45px #112a3b55;opacity:0;pointer-events:none;transition:opacity .24s,transform .24s}.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}.toast-mark{font-size:29px;color:#f6c770}.toast-title{font-size:13px;font-weight:800}.toast-desc{font-size:11px;color:#cee5e2;margin-top:4px}.overlay{position:fixed;z-index:30;inset:0;display:none;justify-content:center;align-items:center;background:#11263899;backdrop-filter:blur(5px);padding:18px}.overlay.open{display:flex}.modal{background:white;border-radius:24px;width:min(760px,100%);max-height:88vh;overflow:auto;padding:24px;box-shadow:0 22px 70px #12283949}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.modal-head h2{margin:0;font-size:20px}.modal-head p{margin:6px 0 0;font-size:12px;color:#78909d}.close{font-size:20px;width:38px;height:38px;background:#f0f4f6;border:0;border-radius:12px;color:#4a6171}.progress-track{height:9px;border-radius:10px;background:#eef3f6;overflow:hidden;margin:17px 0}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#e7b760,#39b49c);border-radius:9px;transition:width .3s}.discovery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-top:13px}.discovery-tile{min-height:106px;border:1px solid #dce9e8;background:#f5fbf8;border-radius:14px;padding:13px 10px;text-align:right;color:#164e50;display:flex;flex-direction:column;justify-content:center;gap:7px}.discovery-tile strong{font-size:22px;font-family:Arial,sans-serif;direction:ltr;text-align:right}.discovery-tile span{font-size:11px;line-height:1.5}.discovery-tile.locked{background:#f6f8fa;border-color:#e9eef1;color:#a0aeb6}.discovery-tile.locked strong{font-size:26px}.modal-info{margin-top:17px;padding:16px;background:#f7fafb;border:1px solid #e8eff1;border-radius:15px;font-size:12px;line-height:1.9}.modal-info strong{font-size:15px;color:#1c625f;display:block}.muted{color:#78929f}.tutorial{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}.tutorial-item{border:1px solid #e8eef1;background:#f7fafb;border-radius:15px;padding:15px;font-size:12px;line-height:1.9}.tutorial-num{width:29px;height:29px;border-radius:10px;display:grid;place-items:center;color:#fff;background:#176f69;margin-bottom:9px}.notice{padding:12px 14px;background:#edf7f4;color:#28695f;border:1px solid #d5eae3;border-radius:12px;font-size:12px;line-height:1.8}.confirm-panel{margin-top:22px;padding-top:17px;border-top:1px solid var(--line)}.confirm-panel p{font-size:11px;color:#728796}.reset-button{color:#a44443;border-color:#edcecd}.sr-only{position:absolute;clip:rect(0,0,0,0);height:1px;width:1px;overflow:hidden;white-space:nowrap}@media(max-width:1230px){.layout{grid-template-columns:195px minmax(0,1fr) 263px;gap:12px}.shell{padding:19px 16px 28px}.palette,.results{padding:18px 12px}.stage{height:425px}}@media(max-width:1010px){.layout{grid-template-columns:220px minmax(0,1fr)}.results{grid-column:1/-1}.result-display{min-height:130px}.hero h1{font-size:21px}}@media(max-width:650px){.shell{padding:12px 11px 35px}.topbar{margin-bottom:14px}.brand-icon{height:43px;width:43px;border-radius:13px}.brand strong{font-size:20px}.brand small{font-size:10px}.version{display:none}.top-actions{gap:5px}.top-actions .btn{font-size:11px;padding:8px;min-height:35px}.hero{border-radius:18px;padding:17px 18px;grid-template-columns:1fr;gap:13px}.hero h1{font-size:20px;margin:6px 0}.hero p{font-size:11.5px}.hero-side{gap:11px}.hero-stat{text-align:right;min-width:0;display:flex;align-items:center;gap:5px}.hero-stat strong{font-size:19px}.hero-stat small{font-size:10px}.hero-sep{height:20px}.layout{display:flex;flex-direction:column;gap:12px}.palette,.lab,.results{width:100%}.palette{padding:14px}.palette .section-desc{margin-bottom:11px}.atom-palette{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.element-tile{min-height:79px;padding:7px 4px;text-align:center;align-items:center;border-radius:11px}.element-tile .symbol{font-size:25px}.element-tile .name{font-size:8px}.element-tile:after{display:none}.element-tile .atomic-number{font-size:9px}.palette-foot{display:none}.lab-head{padding:17px 14px 13px}.toolbar{padding:0 13px 14px;gap:7px}.toolbar-label{font-size:10px}.stage{height:355px}.stage-atom{width:57px;height:57px;font-size:24px}.stage-footer{padding:12px 14px;line-height:1.6}.results{padding:17px}.result-display{min-height:154px}.tutorial{grid-template-columns:1fr}.modal{padding:18px}.modal-head h2{font-size:18px}}@media(max-width:380px){.stage{height:310px}.bond-tool{min-width:32px}.bond-tool.erase{min-width:38px}.btn.icon{padding:10px 8px}.hero{padding:15px}.hero h1{font-size:18px}.stage-atom{width:53px;height:53px}.brand small{display:none}}
+
+/* v0.2: optional atomic encyclopedia and explicit structure report */
+.element-card{min-width:0;display:flex;flex-direction:column;gap:4px}.element-card .element-tile{width:100%;flex:1}.element-info-trigger{font-weight:700;color:#146f69;border:1px solid #dcebe8;background:#f4fbf8;font-size:10px;padding:5px 3px;border-radius:8px;min-height:30px}.element-info-trigger:hover{background:#e4f5ef}.atom-prompt{margin-top:12px;border:1px solid #b9dfd6;border-radius:12px;padding:11px 10px;background:#f0faf5;font-size:11px;line-height:1.7}.atom-prompt strong{color:#146b60}.atom-prompt p{margin:4px 0 10px;color:#536e71}.prompt-actions{display:flex;flex-wrap:wrap;gap:6px}.prompt-actions .btn{font-size:10px;min-height:34px;padding:8px}.analyze-button{width:100%;margin-top:13px;font-size:12px}.analysis-summary{border:1px solid #dce7eb;border-radius:15px;background:#f5fafb;padding:16px;margin:14px 0}.analysis-summary .formula{font:bold 35px Arial,sans-serif;direction:ltr;text-align:right;color:#186d6b;display:block}.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0}.analysis-tile{padding:11px;border:1px solid #e3e9ee;border-radius:13px;background:white;font-size:12px;line-height:1.8}.analysis-tile strong{display:block;color:#264c59}.analysis-note{background:#fff7e8;border:1px solid #e5d5b0;padding:12px;border-radius:12px;font-size:12px;line-height:1.9;color:#725c38;margin:12px 0}.analysis-ok{background:#eef9f3;border-color:#c7e9d8;color:#21684c}.analysis-section-title{font-size:15px;color:#173f4e;margin:20px 0 8px}.analysis-table{width:100%;border-collapse:collapse;font-size:11.5px}.analysis-table th,.analysis-table td{padding:9px 8px;border-bottom:1px solid #e9eff2;text-align:right;vertical-align:top}.analysis-table th{background:#eff5f7;color:#355664}.analysis-table tr:nth-child(even){background:#fafcfc}.info-hero{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid #e2edef;border-radius:14px;background:#f6f9fa;margin-top:15px}.info-hero .big-symbol{display:grid;place-items:center;width:68px;height:68px;border-radius:17px;font:bold 32px Arial,sans-serif;color:#176f6a;background:#e0f3ed;flex-shrink:0}.info-hero p{font-size:12px;color:#607988;line-height:1.8;margin:5px 0 0}.analysis-link{color:#0d6a66;text-decoration:underline;text-underline-offset:3px}.analysis-small{font-size:11px;line-height:1.8;color:#627a88}.analysis-inline-tag{display:inline-block;background:#e5f4f1;color:#1c7168;border-radius:30px;padding:4px 9px;margin:3px 3px 3px 0;font-size:11px}
+@media(max-width:650px){.element-info-trigger{font-size:9px;padding:5px 1px}.analysis-grid{grid-template-columns:1fr}.analysis-table{font-size:10.5px}.analysis-table th,.analysis-table td{padding:7px 5px}.info-hero .big-symbol{width:60px;height:60px}.atom-prompt{font-size:11px}}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="brand-icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44" stroke="currentColor" stroke-width="2"><ellipse cx="22" cy="22" rx="17" ry="7" transform="rotate(52 22 22)"/><ellipse cx="22" cy="22" rx="17" ry="7" transform="rotate(-52 22 22)"/><circle cx="22" cy="22" r="4" fill="currentColor" stroke="none"/></svg></div><div><strong>ذرّة <span style="font-size:12px;color:#66838d">/ MATTER LAB</span></strong><small>مختبر الاكتشاف الكيميائي</small></div></div>
+  <div class="top-actions"><span class="version">نسخة تجريبية 0.2</span><button class="btn icon" id="open-help" type="button">؟ كيف ألعب</button><button class="btn primary" id="open-book" type="button"><svg class="svgicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v14M4 4h6a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h6z"/></svg> اكتشافاتي</button></div>
+</header>
+<section class="hero"><div class="hero-content"><div class="eyebrow">اكتشف • جرّب • تعلّم</div><h1>ماذا يمكنك أن تصنع من الذرات؟</h1><p>اختر ذراتك، جرّب وصلها بطرق مختلفة، واكتشف الجزيئات التي يبنى منها العالم. ليس عليك حفظ الإجابات؛ فقط جرّب!</p></div><div class="hero-side"><div class="hero-stat"><strong id="discoveries-count">0</strong><small>جزيئات اكتشفتها</small></div><div class="hero-sep"></div><div class="hero-stat"><strong id="total-count">18</strong><small>جزيئًا في الموسوعة</small></div></div></section>
+<main class="layout">
+  <aside class="card palette"><div class="card-heading"><div class="headericon" aria-hidden="true">⬡</div><h2>لوحة العناصر</h2></div><p class="section-desc">المس أحد العناصر لإضافة ذرة إلى المختبر. يمكنك إضافة أكثر من ذرة من النوع نفسه.</p><div class="atom-palette" id="palette"></div>
+  <div class="atom-prompt" id="atom-info-prompt" hidden role="status" aria-live="polite">
+    <strong id="prompt-title"></strong><p>هل تريد معلومات عن العنصر وروابطه الكيميائية المعتادة؟</p>
+    <div class="prompt-actions"><button class="btn primary" id="prompt-show" type="button">نعم، أريد المعرفة</button><button class="btn ghost" id="prompt-dismiss" type="button">ليس الآن</button></div>
+  </div><div class="palette-foot"><strong>هل تعلم؟</strong>كل مربع يمثل نوعًا من الذرات. عدد العناصر المتاحة الآن خمسة فقط؛ سنوسّع الجدول في مراحل لاحقة.</div></aside>
+  <section class="card lab" aria-label="مساحة تركيب الجزيئات">
+    <div class="lab-head"><div class="lab-title"><h2>مساحة التجريب</h2><p>أنت العالم الصغير. لا توجد وصفة إجبارية.</p></div><span class="scope-pill">● وضع بناء الجزيئات</span></div>
+    <div class="toolbar"><span class="toolbar-label">نوع الرابطة:</span><div class="bond-tools" role="group" aria-label="اختيار نوع الرابطة"><button class="bond-tool current" data-order="1" aria-label="رابطة مفردة" aria-pressed="true" title="مفردة">—</button><button class="bond-tool" data-order="2" aria-label="رابطة مزدوجة" aria-pressed="false" title="مزدوجة">=</button><button class="bond-tool" data-order="3" aria-label="رابطة ثلاثية" aria-pressed="false" title="ثلاثية">≡</button><button class="bond-tool erase" data-order="0" aria-label="حذف رابطة" aria-pressed="false">إزالة</button></div><div class="toolbar-spacer"></div><button class="btn icon" id="selected-info" type="button" disabled>ⓘ معلومات الذرة</button><button class="btn icon" id="delete-atom" type="button" disabled title="اختر ذرة أولًا">حذف ذرة</button><button class="btn icon" id="undo" type="button" disabled title="تراجع (Ctrl+Z)">↶ تراجع</button><button class="btn icon" id="reset-stage" type="button">مسح</button></div>
+    <div class="stage" id="stage"><svg class="stage-graphic" id="bonds-svg" aria-hidden="true"></svg><div id="atoms-layer"></div><div class="stage-empty" id="empty-state"><div class="empty-ring" aria-hidden="true">⚛</div><strong>مختبرك في انتظار أول ذرة</strong><span>اختر عنصرًا من اللوحة، وأضف ذرات أخرى، ثم المس ذرتين لربطهما.</span></div><div class="stage-tip"><span id="stage-hint" role="status" aria-live="polite">أضف ذرات من لوحة العناصر لبدء الاكتشاف.</span></div></div>
+    <div class="stage-footer"><span>الذرات: <strong id="atom-count">0</strong> &nbsp;·&nbsp; الروابط: <strong id="bond-count">0</strong></span><span>اسحب الذرات لتغيير موضعها</span></div>
+  </section>
+  <aside class="card results"><div class="card-heading"><div class="headericon" aria-hidden="true">✦</div><h2>نتيجة التجربة</h2></div><p class="section-desc">نتفحص البنية التي صنعتها ونخبرك بما نعرفه عنها.</p><div class="state-label" id="status-label" role="status">في انتظار التجربة</div><div class="result-display" id="result-display"><div class="result-visual placeholder" id="result-visual">+</div><h3 id="result-title">مختبرك مستعد</h3><p id="result-message">اختر ذرات من لوحة العناصر، ثم المس ذرتين لربطهما.</p></div><button class="btn explain-button" id="toggle-extra" type="button" hidden>اقرأ المزيد عن هذا الجزيء ▾</button><div class="knowledge-extra" id="extra-knowledge" hidden></div><div class="caution" id="warning" hidden></div><button class="btn primary analyze-button" id="analyze-now" type="button">⌕ حلّل تركيبي بالتفصيل</button><div class="result-bottom" id="result-below">هذا النموذج يفحص بنى جزيئية محددة؛ لا يحاكي التفاعلات أو شروط تكوين المواد بعد.</div><div class="learning-row"><span class="learning-bulb" aria-hidden="true">✧</span><p><strong>فكرة المختبر:</strong> ابدأ بالمحاولة، وتعلّم من النتيجة. التركيب غير المعروف ليس بالضرورة مستحيلًا.</p></div></aside>
+</main>
+<footer class="footer">مختبر ذرّة — نموذج تعليمي تفاعلي أولي. التمثيل ثنائي الأبعاد ومبسّط، والمختبر افتراضي: لا تحاول إجراء تجارب بمواد خطرة في الواقع.<br/>دون حسابات أو اتصال بالإنترنت؛ اكتشافاتك تُحفظ داخل هذا المتصفح.</footer>
+</div>
+<div class="toast" id="toast" role="status"><span class="toast-mark" aria-hidden="true">✦</span><div><div class="toast-title" id="toast-title"></div><div class="toast-desc" id="toast-desc"></div></div></div>
+<div class="overlay" id="encyclopedia" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="book-title"><div class="modal"><div class="modal-head"><div><h2 id="book-title">موسوعة اكتشافاتي</h2><p>كل جزيء تتعرف إليه يضاف هنا.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div class="muted" style="font-size:12px" id="progress-count">0 / 18</div><div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div><div class="discovery-grid" id="discovery-list"></div><div class="modal-info" id="discovery-info" hidden></div><div class="confirm-panel"><p>تُخزن اكتشافاتك على هذا الجهاز فقط، ولا تُرسل إلى خادم.</p><button class="btn reset-button" id="reset-discoveries" type="button">مسح دفتر الاكتشافات</button></div></div></div>
+
+<div class="overlay" id="element-details" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="element-details-title"><div class="modal"><div class="modal-head"><div><h2 id="element-details-title">معلومات العنصر</h2><p>يمكنك الاطلاع أو العودة إلى التجريب مباشرة.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div id="element-details-content"></div></div></div>
+<div class="overlay" id="structure-report" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="structure-report-title"><div class="modal"><div class="modal-head"><div><h2 id="structure-report-title">تقرير تحليل التركيب</h2><p>نحلل البنية التي رسمتها، ولا نجزم بوجود مادة لم توثّق.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div id="structure-report-content"></div></div></div>
+<div class="overlay" id="help" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="modal"><div class="modal-head"><div><h2 id="help-title">كيف أستعمل مختبر ذرّة؟</h2><p>ثلاث خطوات، ثم ابدأ التجريب بحرية.</p></div><button class="close" type="button" aria-label="إغلاق النافذة">×</button></div><div class="tutorial"><div class="tutorial-item"><div class="tutorial-num">١</div><strong>أضف الذرات</strong><div>المس مربع العنصر من لوحة العناصر. تقدر أن تضع عدة ذرات من النوع نفسه.</div></div><div class="tutorial-item"><div class="tutorial-num">٢</div><strong>اختر الرابطة</strong><div>اختر رابطة مفردة (—) أو مزدوجة (=) أو ثلاثية (≡)، ثم المس الذرة الأولى والثانية.</div></div><div class="tutorial-item"><div class="tutorial-num">٣</div><strong>شاهد الاكتشاف</strong><div>إذا تطابقت البنية مع جزيء موثق، تظهر بطاقة تعريف ويُضاف إلى الموسوعة. تستطيع أيضًا فتح تقرير تحليل البنية.</div></div></div><div class="notice"><strong>ملحوظة علمية مهمة:</strong> نحن الآن نبني رسومًا لجزيئات معروفة؛ لم نبدأ محاكاة شروط التفاعل أو قياس الاستقرار الفيزيائي. النماذج غير المدرجة في الموسوعة لا تُحكم بالاستحالة.</div><div class="modal-info"><strong>أدوات إضافية</strong>اسحب أي ذرة لتحريكها. اضغط «ⓘ معلومات» بجانب العنصر لمعرفة تكافؤه المعتاد، أو اضغط «معلومات الذرة» بعد تحديد ذرة في الرسم. اختر «إزالة» والمس طرفي الرابطة المراد حذفها. لحذف ذرة المسها مرة واحدة ثم اضغط «حذف ذرة». للتراجع اضغط «تراجع» أو Ctrl+Z. يمكن استعمال الأزرار 1 و2 و3 لاختيار نوع الرابطة.</div></div></div>
+
+<script>
+/* Matter Lab v0.1 — graph-based molecular structure checker.
+   Scope: educational covalent structures, not reaction simulation or
+   predictive computational chemistry. No dependencies. */
+(function(root) {
+  'use strict';
+  const ELEMENTS = Object.freeze({
+    H:  {name:'هيدروجين', number:1,  max:1, tone:'hydrogen',  mass:1.008},
+    C:  {name:'كربون',    number:6,  max:4, tone:'carbon',    mass:12.011},
+    N:  {name:'نيتروجين', number:7,  max:3, tone:'nitrogen',  mass:14.007},
+    O:  {name:'أكسجين',   number:8,  max:2, tone:'oxygen',    mass:15.999},
+    Cl: {name:'كلور',     number:17, max:1, tone:'chlorine',  mass:35.45}
+  });
+
+  // Atom order is independent from chemical formula order. Edges: [atom A, atom B, bond order].
+  function compound(id, name, formula, nodes, edges, overview, extra, group, caution='') {
+    return {id,name,formula,nodes,edges,overview,extra,group,caution};
+  }
+  const MOLECULES = [
+    compound('h2','الهيدروجين الجزيئي','H₂',['H','H'],[[0,1,1]],
+      'غاز يتكون جزيئه من ذرتين من الهيدروجين. وهو أخف الغازات المعروفة.',
+      'الغاز قابل للاشتعال، ويوجد بكثرة في النجوم. لا تجرّب إشعاله في الواقع.','ثنائيات الذرة'),
+    compound('o2','الأكسجين الجزيئي','O₂',['O','O'],[[0,1,2]],
+      'هذا أحد أشكال الأكسجين في الهواء، ويساعد على التنفس وعلى الاحتراق.',
+      'يشكل نحو 21% من حجم الهواء الجاف قرب سطح الأرض. في الرسم نمثل الرابطة برابطة مزدوجة مبسطة.','ثنائيات الذرة'),
+    compound('n2','النيتروجين الجزيئي','N₂',['N','N'],[[0,1,3]],
+      'يتكون من ذرتين من النيتروجين بينهما رابطة ثلاثية قوية.',
+      'يشكل نحو 78% من حجم الهواء الجاف قرب سطح الأرض، وهو أقل تفاعلية من مواد كثيرة أخرى.','ثنائيات الذرة'),
+    compound('cl2','الكلور الجزيئي','Cl₂',['Cl','Cl'],[[0,1,1]],
+      'جزيء مكوّن من ذرتين من الكلور. غازه سام ولا يصلح للتجريب المنزلي.',
+      'الكلور عنصر، لكن شكله الجزيئي الشائع هو Cl₂. هذا المختبر افتراضي فقط.','ثنائيات الذرة','مادة سامة في الواقع.'),
+    compound('hcl','كلوريد الهيدروجين','HCl',['H','Cl'],[[0,1,1]],
+      'جزيء يتكون من هيدروجين وكلور مرتبطين برابطة تساهمية.',
+      'عند ذوبانه في الماء يعطي محلول حمض الهيدروكلوريك. الغاز مهيّج وخطر.','مركبات بسيطة','غاز مهيّج وخطر.'),
+    compound('water','الماء','H₂O',['O','H','H'],[[0,1,1],[0,2,1]],
+      'أحسنت! هذا هو الماء: جزيء مكوّن من ذرة أكسجين وذرتين من الهيدروجين.',
+      'الجزيء منحني الشكل، والماء ضروري للكائنات الحية. خصائصه تختلف تمامًا عن خصائص غازي الهيدروجين والأكسجين.','مركبات بسيطة'),
+    compound('ozone','الأوزون','O₃',['O','O','O'],[[0,1,1],[1,2,2]],
+      'الأوزون صورة من صور الأكسجين يتكون جزيئها من ثلاث ذرات أكسجين.',
+      'يساعد الأوزون المرتفع في طبقة الستراتوسفير على امتصاص الأشعة فوق البنفسجية. أما قرب سطح الأرض فهو ملوّث ضار بالتنفس.','مركبات بسيطة',
+      'الرسم برابطة مفردة وأخرى مزدوجة هو إحدى صيغ الرنين المبسطة؛ رابطتا الأوزون الحقيقيتان متكافئتان تقريبًا. كما أن رسم O₃ لا يعني تكونه تلقائيًا.'),
+    compound('co2','ثاني أكسيد الكربون','CO₂',['C','O','O'],[[0,1,2],[0,2,2]],
+      'غاز يتكون من ذرة كربون وذرتين من الأكسجين؛ جزيئه خطي تقريبًا.',
+      'ينتج من التنفس والاحتراق، وتستخدمه النباتات في البناء الضوئي. ارتفاع تركيزه يسهم في الاحترار العالمي.','مركبات بسيطة'),
+    compound('methane','الميثان','CH₄',['C','H','H','H','H'],[[0,1,1],[0,2,1],[0,3,1],[0,4,1]],
+      'أبسط الهيدروكربونات: ذرة كربون مرتبطة بأربع ذرات هيدروجين.',
+      'هو المكوّن الأساسي للغاز الطبيعي، وجزيئه رباعي السطوح في الواقع. وهو غاز قابل للاشتعال.','كيمياء الكربون'),
+    compound('ammonia','الأمونيا','NH₃',['N','H','H','H'],[[0,1,1],[0,2,1],[0,3,1]],
+      'جزيء يتكون من ذرة نيتروجين مرتبطة بثلاث ذرات هيدروجين.',
+      'للأمونيا دور في صناعة الأسمدة. شكل جزيئها هرمي ثلاثي، ورائحتها نفاذة وهي مهيّجة.','مركبات بسيطة','مادة مهيّجة في الواقع.'),
+    compound('peroxide','فوق أكسيد الهيدروجين','H₂O₂',['H','O','O','H'],[[0,1,1],[1,2,1],[2,3,1]],
+      'يُعرف أيضًا ببيروكسيد الهيدروجين. يحتوي الجزيء على رابطة بين ذرتي أكسجين.',
+      'يمكن أن يتحلل إلى ماء وأكسجين. بعض محاليله المركزة خطرة، فلا تُجرَّب التفاعلات خارج المختبر الافتراضي.','مركبات بسيطة','المحاليل المركزة مؤذية.'),
+    compound('formaldehyde','الميثانال','CH₂O',['C','O','H','H'],[[0,1,2],[0,2,1],[0,3,1]],
+      'يُسمّى أيضًا الفورمالدهيد. يحتوي على رابطة مزدوجة بين الكربون والأكسجين.',
+      'يستخدم في صناعات محددة، لكنه مادة سامة ومهيّجة. هذا وصف علمي لا دعوة لصنعه.','كيمياء الكربون','مادة سامة ومهيّجة.'),
+    compound('ethane','الإيثان','C₂H₆',['C','C','H','H','H','H','H','H'],
+      [[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1],[1,6,1],[1,7,1]],
+      'يتكون من ذرتي كربون بينهما رابطة مفردة، وست ذرات هيدروجين.',
+      'الإيثان من الهيدروكربونات المشبعة، ويوجد ضمن مكونات الغاز الطبيعي.','كيمياء الكربون'),
+    compound('ethene','الإيثين','C₂H₄',['C','C','H','H','H','H'],
+      [[0,1,2],[0,2,1],[0,3,1],[1,4,1],[1,5,1]],
+      'يحتوي جزيء الإيثين على رابطة مزدوجة بين ذرتي الكربون.',
+      'يسمى أيضًا الإيثيلين. تستعمله الصناعة لإنتاج مواد منها البولي إيثيلين، وله دور في نضج الثمار.','كيمياء الكربون'),
+    compound('ethyne','الإيثاين','C₂H₂',['C','C','H','H'],[[0,1,3],[0,2,1],[1,3,1]],
+      'بين ذرتي الكربون رابطة ثلاثية؛ ويسمى المركب أيضًا الأسيتيلين.',
+      'غاز سريع الاشتعال يستعمل في بعض عمليات اللحام الصناعية.','كيمياء الكربون'),
+    compound('methanol','الميثانول','CH₄O',['C','O','H','H','H','H'],
+      [[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1]],
+      'هو كحول بسيط يتكون من كربون وأكسجين وهيدروجين.',
+      'الميثانول سام؛ حتى الكميات الصغيرة قد تسبب أضرارًا خطيرة. يُستخدم صناعيًا، ولا يجوز شربه.','كيمياء الكربون','الميثانول مادة سامة.'),
+    compound('ethanol','الإيثانول','C₂H₆O',['C','C','O','H','H','H','H','H','H'],
+      [[0,1,1],[1,2,1],[0,3,1],[0,4,1],[0,5,1],[1,6,1],[1,7,1],[2,8,1]],
+      'كحول يحتوي على مجموعـة O–H متصلة بسلسلة من ذرتي كربون.',
+      'للإيثانول استخدامات صناعية وطبية. تركيبه يختلف عن ثنائي ميثيل الإيثر، رغم اشتراكهما في الصيغة نفسها.','كيمياء الكربون'),
+    compound('dme','ثنائي ميثيل الإيثر','C₂H₆O',['C','O','C','H','H','H','H','H','H'],
+      [[0,1,1],[1,2,1],[0,3,1],[0,4,1],[0,5,1],[2,6,1],[2,7,1],[2,8,1]],
+      'جزيء صيغته C₂H₆O، لكنه يختلف في البنية عن الإيثانول.',
+      'هذه ظاهرة تسمى التماكب البنيوي: الصيغة نفسها لا تعني دائمًا المادة نفسها.','كيمياء الكربون')
+  ];
+
+  const simplify = atom => atom && (atom.symbol || atom.element);
+  function counts(nodes) {
+    const out={};
+    nodes.forEach(s=>out[s]=(out[s]||0)+1);
+    return out;
+  }
+  function sameCounts(a,b) {
+    return Object.keys(a).length===Object.keys(b).length && Object.keys(a).every(k=>a[k]===b[k]);
+  }
+  function degrees(nodes, edges) {
+    const out=Array.from({length:nodes.length},()=>[]);
+    for (const [a,b,o] of edges) {out[a].push(o);out[b].push(o);}
+    return out.map(d=>d.sort((a,b)=>a-b).join(','));
+  }
+  // Exact labeled graph isomorphism (not just formula matching). Works well for our <=9-atom catalog.
+  function structureMatches(inputNodes, inputEdges, reference) {
+    const refNodes=reference.nodes, refEdges=reference.edges;
+    if(inputNodes.length!==refNodes.length || inputEdges.length!==refEdges.length) return false;
+    if(!sameCounts(counts(inputNodes),counts(refNodes))) return false;
+    const inDeg=degrees(inputNodes,inputEdges), refDeg=degrees(refNodes,refEdges);
+    const inMatrix=Array.from({length:inputNodes.length},()=>Array(inputNodes.length).fill(0));
+    const refMatrix=Array.from({length:refNodes.length},()=>Array(refNodes.length).fill(0));
+    for(const [a,b,o] of inputEdges) {inMatrix[a][b]=o;inMatrix[b][a]=o;}
+    for(const [a,b,o] of refEdges) {refMatrix[a][b]=o;refMatrix[b][a]=o;}
+    const candidates=refNodes.map((s,j)=>inputNodes.map((v,i)=>v===s&&inDeg[i]===refDeg[j]?i:-1).filter(i=>i>=0));
+    if(candidates.some(c=>c.length===0)) return false;
+    const order=refNodes.map((_,i)=>i).sort((a,b)=>candidates[a].length-candidates[b].length);
+    const mapping=Array(refNodes.length).fill(-1), used=new Set();
+    function visit(k) {
+      if(k===order.length) return true;
+      const r=order[k];
+      for(const i of candidates[r]) {
+        if(used.has(i)) continue;
+        let good=true;
+        for(let t=0;t<k;t++) { const prev=order[t];if(refMatrix[r][prev]!==inMatrix[i][mapping[prev]]) {good=false;break;} }
+        if(!good) continue;
+        mapping[r]=i;used.add(i);
+        if(visit(k+1)) return true;
+        used.delete(i);mapping[r]=-1;
+      }
+      return false;
+    }
+    return visit(0);
+  }
+  function describeAtom(atom) {return (ELEMENTS[atom.symbol]||{}).name||atom.symbol;}
+  function analyze(atoms,bonds) {
+    if(!atoms.length) return {kind:'empty', title:'مختبرك مستعد',message:'اختر ذرات من لوحة العناصر، ثم المس ذرتين لربطهما.'};
+    const byId=new Map(atoms.map((a,i)=>[a.id,i]));
+    if(atoms.some(a=>!ELEMENTS[a.symbol])) return {kind:'invalid',title:'عنصر غير مدعوم',message:'هناك ذرة غير معروفة في هذا الإصدار.'};
+    const seen=new Set(), edges=[];
+    for(const bond of bonds) {
+      const a=byId.get(bond.a), b=byId.get(bond.b);
+      if(a===undefined||b===undefined||a===b||!([1,2,3].includes(bond.order)))
+        return {kind:'invalid',title:'خطأ في الربط',message:'تحقق من صحة الروابط.'};
+      const key=Math.min(a,b)+'-'+Math.max(a,b);
+      if(seen.has(key)) return {kind:'invalid',title:'رابطة مكررة',message:'لا يمكن تكرار الرابطة نفسها بين ذرتين.'};
+      seen.add(key);edges.push([a,b,bond.order]);
+    }
+    if(atoms.length===1) return {kind:'building',title:'بداية تجربة',message:'أضف ذرة أخرى، ثم اختر الذرتين لتكوين رابطة.'};
+    const adj=Array.from({length:atoms.length},()=>[]);
+    for(const [a,b] of edges){adj[a].push(b);adj[b].push(a);}
+    const reached=new Set([0]);const queue=[0];
+    while(queue.length) for(const v of adj[queue.shift()]) if(!reached.has(v)){reached.add(v);queue.push(v);}
+    if(reached.size!==atoms.length) return {kind:'disconnected',title:'ذرات لم ترتبط بعد',message:'لديك مجموعات منفصلة. اربط الذرات التي تريد إدخالها في جزيء واحد، أو احذف الزائد منها.'};
+    const nodes=atoms.map(simplify);
+    const known=MOLECULES.find(m=>structureMatches(nodes,edges,m));
+    if(known) return {kind:'found',title:'اكتشاف علمي!',message:known.overview,molecule:known};
+    const valences=Array(atoms.length).fill(0);
+    for(const [a,b,o] of edges){valences[a]+=o;valences[b]+=o;}
+    const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max);
+    if(excess) return {kind:'overbonded',title:'الروابط تحتاج مراجعة',message:`في النموذج المبسط الحالي، لا تتوافق هذه الروابط مع التكافؤ المعتاد لعنصر ${describeAtom(excess)}. جرّب تقليل رتبة رابطة أو تغيير التركيب. بعض الجزيئات الحقيقية تتطلب قواعد أكثر تقدمًا.`};
+    const pending=atoms.filter((a,i)=>valences[i]<ELEMENTS[a.symbol].max);
+    if(pending.length) return {kind:'building',title:'قد يكون الجزيء غير مكتمل',message:'جرّب إضافة ذرات أو تعديل الروابط. هذه إشارة وفق قاعدة التكافؤ المبسطة، وليست حكمًا نهائيًا على إمكان وجود المادة.'};
+    return {kind:'unknown',title:'تركيب يستحق البحث',message:'لا يوجد هذا التركيب في موسوعة هذا الإصدار. هذا لا يعني أنه مستحيل؛ قواعد التكافؤ وحدها لا تكفي لإثبات استقرار الجزيئات.'};
+  }
+
+  // Report on what was *drawn*. It does not establish quantum stability, charge, or synthetic feasibility.
+  function inspectStructure(atoms,bonds) {
+    const result=analyze(atoms,bonds);
+    const c={}; for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
+    const order=['C','H',...Object.keys(c).filter(x=>!['C','H'].includes(x)).sort()];
+    const displayDigit=n=>String(n).replace(/[0-9]/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
+    const formula=order.filter(s=>c[s]).map(s=>s+(c[s]>1?displayDigit(c[s]):'')).join('');
+    const byId=new Map(atoms.map(a=>[a.id,a]));
+    const atomDetails=atoms.map((a,i)=>{
+      const links=bonds.filter(b=>b.a===a.id||b.b===a.id);
+      const used=links.reduce((sum,b)=>sum+b.order,0);
+      const limit=ELEMENTS[a.symbol]?.max??null;
+      // For curated molecules, some resonance contributors include unusual bond-order counts.
+      const typical=limit===null?'غير مدعوم':result.kind==='found'?'بنية موثقة':used>limit?'يتجاوز التكافؤ المبسط':used<limit?'أقل من التكافؤ المبسط':'متوافق مع النمط المبسط';
+      return {number:i+1,symbol:a.symbol,name:ELEMENTS[a.symbol]?.name||a.symbol,links:links.length,used,limit,typical};
+    });
+    const edgeCounts={single:0,double:0,triple:0};
+    for(const b of bonds){if(b.order===1)edgeCounts.single++;else if(b.order===2)edgeCounts.double++;else if(b.order===3)edgeCounts.triple++;}
+    const totalMass=atoms.reduce((v,a)=>v+(ELEMENTS[a.symbol]?.mass||0),0);
+    const valenceElectrons={H:1,C:4,N:5,O:6,Cl:7};
+    const totalValenceElectrons=atoms.reduce((v,a)=>v+(valenceElectrons[a.symbol]||0),0);
+    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,c,atomCount:atoms.length,bondCount:bonds.length,
+      allAtomsKnown:atoms.every(a=>ELEMENTS[a.symbol]), allBondEndsKnown:bonds.every(b=>byId.has(b.a)&&byId.has(b.b))};
+  }
+  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure};
+  if(typeof module==='object'&&module.exports) module.exports=api;
+  root.MatterLabEngine=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+(function(){
+'use strict';
+const {ELEMENTS,MOLECULES,analyze,inspectStructure}=window.MatterLabEngine;
+const STORAGE_KEY='matter-lab-discoveries-v1';
+const $=selector=>document.querySelector(selector);
+const el=(tag, className, text)=>{const n=document.createElement(tag); if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;};
+const htmlEscape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let atoms=[],bonds=[],selected=null,order=1,nextId=1,history=[],lastFoundId=null;
+let discovered=loadDiscoveries(),toastTimer;
+const MAX_ATOMS=16;
+
+const ELEMENT_FACTS={
+ H:{group:'المجموعة 1 · الدورة 1',configuration:'1s¹',character:'أخف العناصر الكيميائية، ويوجد عادةً في صورة غاز H₂.',usual:'رابطة تساهمية مفردة واحدة في أغلب الجزيئات المحايدة البسيطة.',patterns:['H—H في الهيدروجين الجزيئي','H—O في الماء','H—C في الميثان'],note:'للهيدروجين حالات أيونية وروابط خاصة لا يمثلها هذا النموذج البسيط.'},
+ C:{group:'المجموعة 14 · الدورة 2',configuration:'1s² 2s² 2p²',character:'عنصر أساسي في الكيمياء العضوية، ويستطيع تكوين سلاسل وحلقات وتراكيب كثيرة.',usual:'أربع وحدات من رتبة الرابطة في أمثلة شائعة: أربع مفردة، أو اثنتان مزدوجتان، أو رابطة ثلاثية مع مفردة.',patterns:['أربع روابط مفردة في CH₄','رابطتان مزدوجتان في CO₂','ثلاثية مع مفردة في C₂H₂'],note:'لا تكفي قاعدة الأربع روابط لإثبات استقرار أي تركيب كربوني؛ توجد أيونات وجذور حرة.'},
+ N:{group:'المجموعة 15 · الدورة 2',configuration:'1s² 2s² 2p³',character:'عنصر موجود بكثرة في الهواء داخل جزيئات N₂، ويدخل في البروتينات والأحماض النووية.',usual:'ثلاث روابط تساهمية في أمثلة محايدة شائعة، وقد يظهر بأربع روابط مع شحنة موجبة كما في NH₄⁺.',patterns:['ثلاث روابط مفردة في NH₃','رابطة ثلاثية في N₂','روابط مزدوجة في مركبات أخرى'],note:'نوع الرابطة وحالة الشحنة يعتمدان على الجزيء كله، وليس على اسم العنصر وحده.'},
+ O:{group:'المجموعة 16 · الدورة 2',configuration:'1s² 2s² 2p⁴',character:'عنصر مهم للتنفس والاحتراق، ويوجد في الهواء غالبًا على هيئة O₂.',usual:'رابطتان مفردتان أو رابطة مزدوجة واحدة في أمثلة محايدة شائعة.',patterns:['رابطتان مفردتان في H₂O','رابطة مزدوجة في O₂ أو CO₂','في O₃ توجد بنية رنين وشحنات شكلية'],note:'الأوزون لا تفسره قاعدة رابطتين لكل أكسجين وحدها؛ توجد روابط متكافئة تقريبًا وتوزّع إلكتروني غير ممثل بالكامل هنا.'},
+ Cl:{group:'المجموعة 17 · الدورة 3',configuration:'[Ne] 3s² 3p⁵',character:'عنصر من الهالوجينات. غازه Cl₂ سام، ويدخل الكلور في مواد عديدة.',usual:'رابطة تساهمية مفردة واحدة غالبًا في الجزيئات البسيطة مثل HCl وCl₂.',patterns:['Cl—H في HCl','Cl—Cl في Cl₂','يظهر في أيون الكلوريد Cl⁻ دون رابطة تساهمية'],note:'قد تظهر للكلور حالات أكسدة وروابط مختلفة في مركبات أكثر تعقيدًا. لا تخلط عدد الأكسدة بعدد الروابط.'}
+};
+// Nature and industrial preparation are independent properties, never exclusive categories.
+// Curated educational notes only; missing statements are not evidence of non-existence.
+const OCCURRENCE={
+ h2:['موجود طبيعيًا في النجوم ووسط الكون.','يُنتَج صناعيًا.'],
+ o2:['يوجد طبيعيًا في الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
+ n2:['يشكل معظم الغلاف الجوي.','يُفصل صناعيًا من الهواء.'],
+ cl2:[null,'يُنتَج صناعيًا، وهو غاز سام.'],
+ hcl:['يوجد في بعض الغازات البركانية.','يُنتَج صناعيًا.'],
+ water:['يوجد طبيعيًا في البحار والأنهار والسحب والكائنات الحية.','يمكن إنتاجه أو استخلاصه ومعالجته صناعيًا.'],
+ ozone:['يوجد طبيعيًا في الغلاف الجوي.','يمكن إنتاجه بواسطة أجهزة توليد الأوزون.'],
+ co2:['يوجد طبيعيًا في الهواء وينتج عن تنفس الكائنات الحية.','يُنتَج أو يُستخلص صناعيًا.'],
+ methane:['يوجد في الغاز الطبيعي وبيئات حيوية معينة.','يمكن إنتاجه صناعيًا.'],
+ ammonia:['يوجد بكميات صغيرة في الطبيعة.','يُنتَج صناعيًا لإنتاج الأسمدة.'],
+ peroxide:['قد يتكون بكميات صغيرة في عمليات طبيعية.','يُنتَج صناعيًا.'],
+ formaldehyde:['قد يتكوّن في عمليات طبيعية وحيوية.','يُنتَج صناعيًا.'],
+ ethane:['يوجد في الغاز الطبيعي.','يُفصل ضمن العمليات الصناعية لمعالجة الغاز.'],
+ ethene:['تُنتجه النباتات، ويشارك في نضج بعض الثمار.','يُنتَج صناعيًا لإنتاج البوليمرات.'],
+ ethyne:[null,'يُنتَج صناعيًا.'],
+ methanol:['يوجد بكميات ضئيلة في مصادر طبيعية.','يُنتَج صناعيًا، وهو سام.'],
+ ethanol:['يمكن أن ينشأ طبيعيًا بفعل التخمر.','يُنتَج صناعيًا لأغراض عديدة.'],
+ dme:[null,'يُنتَج صناعيًا.']
+};
+let promptedFor=new Set(),promptSymbol=null;
+function infoPrompt(symbol){
+ if(promptedFor.has(symbol))return;
+ promptedFor.add(symbol);promptSymbol=symbol;
+ $('#prompt-title').textContent='أضفت '+ELEMENTS[symbol].name+' إلى المختبر.';
+ $('#atom-info-prompt').hidden=false;
+}
+function showElementFacts(symbol){
+ const info=ELEMENTS[symbol],fact=ELEMENT_FACTS[symbol];if(!info||!fact)return;
+ $('#atom-info-prompt').hidden=true;
+ $('#element-details-title').textContent=info.name+' — '+symbol;
+ $('#element-details-content').innerHTML=`<div class="info-hero"><span class="big-symbol" dir="ltr">${symbol}</span><div><strong>${htmlEscape(info.name)}</strong><p>العدد الذري: ${info.number} · الكتلة الذرية التقريبية: ${info.mass} u · ${htmlEscape(fact.group)}</p></div></div>
+ <div class="analysis-grid"><div class="analysis-tile"><strong>التوزيع الإلكتروني</strong><span dir="ltr">${htmlEscape(fact.configuration)}</span></div><div class="analysis-tile"><strong>ماذا نعرف عنه؟</strong>${htmlEscape(fact.character)}</div></div>
+ <h3 class="analysis-section-title">كيف يرتبط عادةً؟</h3><p class="analysis-small">${htmlEscape(fact.usual)}</p>
+ <div>${fact.patterns.map(x=>`<span class="analysis-inline-tag">${htmlEscape(x)}</span>`).join('')}</div>
+ <div class="analysis-note">${htmlEscape(fact.note)}</div><p class="analysis-small">هذه أمثلة تعليمية للروابط التساهمية. القاعدة المبسطة ليست حدًا مطلقًا، ولا تثبت وحدها وجود مادة أو استقرارها.</p>`;
+ showModal('element-details');
+}
+function showStructureReport(){
+ const info=inspectStructure(atoms,bonds),out=$('#structure-report-content'),res=info.result;
+ if(!atoms.length){out.innerHTML='<div class="analysis-note">لم تضف أي ذرات بعد. أضف ذرتين على الأقل وجرّب ربطهما.</div>';showModal('structure-report');return;}
+ const known=res.kind==='found';
+ let verdict='',type='',occ='';
+ if(known){
+  verdict=`<div class="analysis-note analysis-ok"><strong>بنية موثقة: ${htmlEscape(res.molecule.name)}</strong><div>${htmlEscape(res.molecule.overview)}</div><div>${htmlEscape(res.molecule.extra)}</div></div>`;
+  const [natural,industrial]=OCCURRENCE[res.molecule.id]||[null,null];
+  occ=`<h3 class="analysis-section-title">هل توجد في الطبيعة؟ وهل تُنتَج صناعيًا؟</h3>
+   <div class="analysis-grid"><div class="analysis-tile"><strong>الوجود في الطبيعة</strong>${htmlEscape(natural||'لم نراجع هذه المعلومة لهذا الجزيء بعد؛ لا يعني ذلك عدم وجوده في الطبيعة.')}</div><div class="analysis-tile"><strong>التحضير أو الإنتاج الصناعي</strong>${htmlEscape(industrial||'لم نراجع هذه المعلومة لهذا الجزيء بعد.')}</div></div>`;
+ }else if(res.kind==='overbonded'){
+  verdict=`<div class="analysis-note"><strong>تعارض مع قاعدة التكافؤ التعليمية</strong><div>${htmlEscape(res.message)}</div>هذا لا يثبت الاستحالة النظرية؛ فالشحنات والحالات الإلكترونية والجذور غير ممثلة هنا.</div>`;
+ }else if(res.kind==='building'||res.kind==='disconnected'){
+  verdict=`<div class="analysis-note"><strong>تركيب يحتاج إلى استكمال أو تفسير</strong><div>${htmlEscape(res.message)}</div>قد يلزم إضافة ذرات أو تغيير الروابط، أو توضيح الشحنة والإلكترونات غير المزدوجة.</div>`;
+ }else{
+  verdict=`<div class="analysis-note"><strong>الحالة العلمية غير محسومة بهذا المحرك</strong><div>${htmlEscape(res.message)}</div>عدم وجود تركيب في موسوعتنا لا يسمح بالحكم بأنه ممكن نظريًا، أو مستحيل نظريًا، أو موجود طبيعيًا أو صناعيًا.</div>`;
+ }
+ type=known?'<strong>مطابقة بنيوية لمركب موثق في الموسوعة</strong>':'<strong>صيغة تركيبك لا تعني بالضرورة وجود جزيء مستقل</strong>';
+ const atomRows=info.atomDetails.map(a=>`<tr><td>${a.number}</td><td dir="ltr">${htmlEscape(a.symbol)}</td><td>${a.links}</td><td>${a.used}</td><td>${a.limit===null?'—':a.limit}</td><td>${htmlEscape(a.typical)}</td></tr>`).join('');
+ const c={};for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
+ const matches=MOLECULES.filter(m=>{const t={};m.nodes.forEach(s=>t[s]=(t[s]||0)+1);return Object.keys(t).length===Object.keys(c).length && Object.entries(c).every(([k,v])=>t[k]===v)});
+ const same=(!known&&matches.length)?`<div class="analysis-note">وجدنا جزيئات معروفة لها <strong>عدد الذرات نفسه</strong> في موسوعتنا، لكن ذلك لا يعني تطابق بنيتها مع رسمك: ${matches.map(m=>htmlEscape(m.name)).join('، ')}.</div>`:'';
+ const electronNote=(info.totalValenceElectrons%2===1)?`<div class="analysis-note"><strong>ملاحظة إلكترونية إضافية:</strong> مجموع إلكترونات التكافؤ للذرات المرسومة هو ${info.totalValenceElectrons} (عدد فردي). إذا كان النوع الكيميائي متعادل الشحنة، فلن تكون كل إلكتروناته مزدوجة؛ لذلك لا يمكن التعامل معه باعتباره جزيئًا متعادلًا مغلق الغلاف الإلكتروني. قد يكون جذرًا أو يتطلب وصفًا مختلفًا، ولا نستنتج استقراره من ذلك.</div>`:'';
+ const caution=known&&res.molecule.caution?`<div class="analysis-note">${htmlEscape(res.molecule.caution)}</div>`:'';
+ out.innerHTML=`<div class="analysis-summary"><span class="analysis-small">الصيغة المحسوبة بعدّ الذرات</span><span class="formula">${htmlEscape(info.formula)}</span><div class="analysis-small">${type}</div></div>
+ <div class="analysis-grid"><div class="analysis-tile"><strong>عدد الذرات</strong>${info.atomCount} ذرة · مجموع الكتل الذرية ${info.totalMass.toFixed(3)} u تقريبًا</div><div class="analysis-tile"><strong>عدد الروابط المرسومة</strong>${info.bondCount} رابطة (مفردة: ${info.edgeCounts.single}، مزدوجة: ${info.edgeCounts.double}، ثلاثية: ${info.edgeCounts.triple})</div></div>
+ ${verdict}${electronNote}${same}${occ}<h3 class="analysis-section-title">فحص كل ذرة</h3>
+ <div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>رقم</th><th>عنصر</th><th>وصلات</th><th>مجموع رتبها</th><th>المعتاد</th><th>الملاحظة</th></tr></thead><tbody>${atomRows}</tbody></table></div>
+ ${caution}<div class="analysis-note">حدود التحليل: لا يمثل هذا الإصدار الشحنة الشكلية ولا الإلكترونات الحرة أو الرنين بصورة كاملة، ولا يقدّر الاستقرار بالطاقة الكمّية أو إمكانية التصنيع. إن وصف «غير موجود في الفهرس» ليس حكمًا باستحالة وجوده.</div>
+ <p class="analysis-small">للتوسع: <a class="analysis-link" href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubChem</a> وقاموس <a class="analysis-link" href="https://goldbook.iupac.org/" target="_blank" rel="noopener noreferrer">IUPAC</a> (تحتاج المواقع الخارجية إلى اتصال بالإنترنت).</p>`;
+ showModal('structure-report');
+}
+
+function loadDiscoveries(){try{const arr=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return new Set(Array.isArray(arr)?arr.filter(id=>MOLECULES.some(m=>m.id===id)):[]);}catch{return new Set();}}
+function saveDiscoveries(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify([...discovered]));}catch{/* private mode */}}
+function pushUndo(){history.push(JSON.stringify({atoms,bonds})); if(history.length>60)history.shift();}
+function undo(){if(!history.length)return;const state=JSON.parse(history.pop());atoms=state.atoms;bonds=state.bonds;selected=null;render();}
+function clearWorkspace(){if(!atoms.length)return;pushUndo();atoms=[];bonds=[];selected=null;render();}
+function addAtom(symbol){if(atoms.length>=MAX_ATOMS){showToast('بلغت حد المساحة','يمكنك وضع 16 ذرة في التجربة الواحدة.');return;}
+ pushUndo();const k=atoms.length,theta=k*2.399963229728653,ring=.08+Math.sqrt(k)*.065;
+ const x=Math.max(.12,Math.min(.88,.5+Math.cos(theta)*ring));const y=Math.max(.16,Math.min(.82,.47+Math.sin(theta)*ring));
+ atoms.push({id:'atom-'+nextId++,symbol,x,y});selected=null;render();infoPrompt(symbol);}
+function deleteSelected(){if(!selected)return;pushUndo();bonds=bonds.filter(b=>b.a!==selected&&b.b!==selected);atoms=atoms.filter(a=>a.id!==selected);selected=null;render();}
+function setBondOrder(newOrder){order=newOrder;document.querySelectorAll('.bond-tool').forEach(b=>{const current=b.dataset.order===String(order);b.classList.toggle('current',current);b.setAttribute('aria-pressed',String(current));}); updateHint();}
+function tapAtom(id){if(selected===null){selected=id;renderStage();updateHint();return;}
+ if(selected===id){selected=null;renderStage();updateHint();return;}
+ const pair=[selected,id],existing=bonds.find(b=>(b.a===pair[0]&&b.b===pair[1])||(b.a===pair[1]&&b.b===pair[0]));
+ pushUndo();
+ if(order===0){if(existing)bonds=bonds.filter(b=>b!==existing);else {history.pop();showToast('لا توجد رابطة','اختر ذرتين بينهما رابطة لحذفها.');}}
+ else if(existing)existing.order=order;
+ else bonds.push({a:pair[0],b:pair[1],order});
+ selected=null;render();}
+function iconSvg(kind){if(kind==='book')return '<svg class="svgicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h7a3 3 0 0 1 3 3v12a3 3 0 0 0-3-3H4zM20 5h-3a3 3 0 0 0-3 3v12a3 3 0 0 1 3-3h3z"/></svg>';return '';}
+function createPalette(){const palette=$('#palette');for(const [symbol,info] of Object.entries(ELEMENTS)){
+ const wrap=el('div','element-card');
+ const tile=el('button','element-tile '+info.tone);tile.type='button';tile.title='إضافة '+info.name;tile.setAttribute('aria-label','إضافة ذرة '+info.name);
+ tile.innerHTML=`<span class="atomic-number">${info.number}</span><span class="symbol" dir="ltr">${symbol}</span><span class="name">${info.name}</span>`;
+ tile.addEventListener('click',()=>addAtom(symbol));
+ const detail=el('button','element-info-trigger','ⓘ معلومات');detail.type='button';detail.setAttribute('aria-label','معرفة خصائص عنصر '+info.name);detail.addEventListener('click',()=>showElementFacts(symbol));
+ wrap.append(tile,detail);palette.append(wrap);
+ }}
+function renderStage(){const field=$('#stage'),layer=$('#atoms-layer');layer.innerHTML='';
+ $('#empty-state').hidden=atoms.length>0;
+ for(const atom of atoms){const btn=el('button','stage-atom '+ELEMENTS[atom.symbol].tone+(selected===atom.id?' selected':''),atom.symbol);btn.type='button';btn.dataset.atomId=atom.id;btn.title=ELEMENTS[atom.symbol].name+' — اسحب لتحريكه، أو المس لربطه';btn.setAttribute('aria-label','ذرة '+ELEMENTS[atom.symbol].name);btn.style.left=(atom.x*100)+'%';btn.style.top=(atom.y*100)+'%';
+ btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();let dragging=false;const sx=e.clientX,sy=e.clientY,originX=atom.x,originY=atom.y;let snapshotTaken=false;
+ btn.setPointerCapture(e.pointerId);
+ const move=evt=>{if(!dragging&&Math.hypot(evt.clientX-sx,evt.clientY-sy)>7)dragging=true;if(!dragging)return;
+ if(!snapshotTaken){pushUndo();snapshotTaken=true;}
+ const r=field.getBoundingClientRect();atom.x=Math.max(.09,Math.min(.91,originX+(evt.clientX-sx)/r.width));atom.y=Math.max(.12,Math.min(.88,originY+(evt.clientY-sy)/r.height));
+ btn.style.left=(atom.x*100)+'%';btn.style.top=(atom.y*100)+'%';drawBonds();};
+ const end=evt=>{btn.removeEventListener('pointermove',move);btn.removeEventListener('pointerup',end);btn.removeEventListener('pointercancel',cancel);if(!dragging)tapAtom(atom.id);else render();};
+ const cancel=()=>{btn.removeEventListener('pointermove',move);btn.removeEventListener('pointerup',end);btn.removeEventListener('pointercancel',cancel);if(dragging)render();};
+ btn.addEventListener('pointermove',move);btn.addEventListener('pointerup',end);btn.addEventListener('pointercancel',cancel);
+ });
+ // Keyboard-only users can select atoms without pointer interactions.
+ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tapAtom(atom.id);}});
+ layer.append(btn);
+ }
+ drawBonds();}
+function drawBonds(){const svg=$('#bonds-svg'),area=$('#stage'),r=area.getBoundingClientRect();svg.setAttribute('viewBox',`0 0 ${r.width} ${r.height}`);svg.textContent='';
+ const ns='http://www.w3.org/2000/svg';for(const bond of bonds){const a=atoms.find(x=>x.id===bond.a),b=atoms.find(x=>x.id===bond.b);if(!a||!b)continue;
+ const x1=a.x*r.width,y1=a.y*r.height,x2=b.x*r.width,y2=b.y*r.height,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,ox=-dy/len*5.2,oy=dx/len*5.2;
+ const offsets=bond.order===1?[0]:bond.order===2?[-1,1]:[-1,0,1];
+ for(const off of offsets){const line=document.createElementNS(ns,'line');line.setAttribute('x1',x1+ox*off);line.setAttribute('y1',y1+oy*off);line.setAttribute('x2',x2+ox*off);line.setAttribute('y2',y2+oy*off);line.setAttribute('stroke','#6b8595');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-width','5.5');svg.append(line);}
+ }}
+function updateHint(){let str='أضف ذرات من لوحة العناصر لبدء الاكتشاف.';
+ if(atoms.length){if(selected){const atom=atoms.find(a=>a.id===selected);str=`اختر ذرة ثانية ${order===0?'لحذف الرابطة':'لرسم رابطة '+['','مفردة','مزدوجة','ثلاثية'][order]} مع ${ELEMENTS[atom.symbol].name}.`;}else str='المس ذرتين لربطهما، أو اسحب ذرة لتحريكها.';}
+ $('#stage-hint').textContent=str;$('#atom-count').textContent=atoms.length;$('#bond-count').textContent=bonds.length;$('#delete-atom').disabled=!selected;$('#selected-info').disabled=!selected;$('#analyze-now').disabled=!atoms.length;$('#undo').disabled=!history.length;}
+function renderResult(){const result=analyze(atoms,bonds);const found=result.kind==='found';const panel=$('#result-display');panel.className='result-display'+(found?' found':result.kind==='overbonded'||result.kind==='invalid'?' problem':result.kind==='unknown'?' unknown':'');
+ const visual=$('#result-visual');visual.className='result-visual'+(found?'':' placeholder');visual.textContent=found?result.molecule.formula:(result.kind==='overbonded'?'!':result.kind==='unknown'?'?':result.kind==='empty'?'+':'···');
+ $('#result-title').textContent=found?result.molecule.name:result.title;
+ $('#result-message').textContent=result.message;
+ $('#status-label').textContent=found?'اكتشاف صحيح':result.kind==='empty'?'في انتظار التجربة':result.kind==='unknown'?'يحتاج تحققًا':result.kind==='overbonded'?'راجع الروابط':'قيد التركيب';
+ const extra=$('#extra-knowledge'),toggle=$('#toggle-extra'),warning=$('#warning');extra.hidden=true;toggle.hidden=!found;toggle.textContent='اقرأ المزيد عن هذا الجزيء ▾';warning.hidden=!found||!result.molecule.caution;
+ if(found){extra.textContent=result.molecule.extra;warning.textContent=result.molecule.caution;}
+ if(found&&result.molecule.id!==lastFoundId){const m=result.molecule;const isNew=!discovered.has(m.id);if(isNew){discovered.add(m.id);saveDiscoveries();showToast('اكتشاف جديد: '+m.name,'أحسنت! أُضيف إلى موسوعة اكتشافاتك.');}
+ lastFoundId=m.id;
+ }else if(!found){lastFoundId=null;}
+ $('#result-below').textContent=found?'اكتشفت بنية جزيء معروف. نجاح الرسم لا يعني حدوث تفاعل كيميائي تلقائيًا.':'هذا النموذج يفحص بنى جزيئية محددة؛ لا يحاكي التفاعلات أو شروط تكوين المواد بعد.';
+ updateProgress();}
+function render(){renderStage();updateHint();renderResult();}
+function updateProgress(){const count=discovered.size;$('#discoveries-count').textContent=count;$('#total-count').textContent=MOLECULES.length;$('#progress-count').textContent=count+' / '+MOLECULES.length;$('#progress-bar').style.width=(100*count/MOLECULES.length)+'%';}
+function showToast(title,desc){const toast=$('#toast');$('#toast-title').textContent=title;$('#toast-desc').textContent=desc;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3300);}
+function showModal(which){const modal=$('#'+which);modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(which==='encyclopedia')renderEncyclopedia();modal.querySelector('.close').focus();}
+function closeModal(which){const modal=$('#'+which);modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
+function renderEncyclopedia(){const container=$('#discovery-list');container.textContent='';for(const m of MOLECULES){const known=discovered.has(m.id);const b=el('button','discovery-tile'+(known?'':' locked'));b.type='button';b.innerHTML=known?`<strong>${htmlEscape(m.formula)}</strong><span>${htmlEscape(m.name)}</span>`:'<strong>؟</strong><span>لم يُكتشف بعد</span>';
+ b.disabled=!known;if(known)b.addEventListener('click',()=>{$('#discovery-info').hidden=false;$('#discovery-info').innerHTML=`<strong>${htmlEscape(m.name)} — ${htmlEscape(m.formula)}</strong><span>${htmlEscape(m.overview)} ${htmlEscape(m.extra)}</span>${m.caution?`<div class="caution">${htmlEscape(m.caution)}</div>`:''}`;});container.append(b);}
+ $('#discovery-info').hidden=true;}
+function bindEvents(){for(const t of document.querySelectorAll('.bond-tool'))t.addEventListener('click',()=>setBondOrder(Number(t.dataset.order)));
+ $('#prompt-show').addEventListener('click',()=>{if(promptSymbol)showElementFacts(promptSymbol);});
+ $('#prompt-dismiss').addEventListener('click',()=>{$('#atom-info-prompt').hidden=true;});
+ $('#selected-info').addEventListener('click',()=>{const a=atoms.find(x=>x.id===selected);if(a)showElementFacts(a.symbol);});
+ $('#analyze-now').addEventListener('click',showStructureReport);
+ $('#undo').addEventListener('click',undo);$('#reset-stage').addEventListener('click',clearWorkspace);$('#delete-atom').addEventListener('click',deleteSelected);
+ $('#toggle-extra').addEventListener('click',()=>{const n=$('#extra-knowledge');n.hidden=!n.hidden;$('#toggle-extra').textContent=n.hidden?'اقرأ المزيد عن هذا الجزيء ▾':'إخفاء التفاصيل ▴';});
+ $('#open-book').addEventListener('click',()=>showModal('encyclopedia'));$('#open-help').addEventListener('click',()=>showModal('help'));
+ document.querySelectorAll('.close').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.overlay').id)));
+ document.querySelectorAll('.overlay').forEach(d=>d.addEventListener('mousedown',e=>{if(e.target===d)closeModal(d.id);}));
+ $('#reset-discoveries').addEventListener('click',()=>{if(!window.confirm('هل تريد مسح دفتر اكتشافاتك بالكامل وإفراغ مساحة التركيب؟ لا يمكن التراجع عن مسح الاكتشافات.'))return;discovered.clear();saveDiscoveries();atoms=[];bonds=[];selected=null;history=[];lastFoundId=null;renderEncyclopedia();render();});
+ window.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(d=>closeModal(d.id));if(selected){selected=null;renderStage();updateHint();}};
+ if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();} else if((e.key==='Delete'||e.key==='Backspace')&&selected){e.preventDefault();deleteSelected();}
+ else if(['1','2','3'].includes(e.key))setBondOrder(Number(e.key));});
+ window.addEventListener('resize',drawBonds);
+}
+createPalette();bindEvents();setBondOrder(1);render();
+})();
+
+</script>
+</body>
+</html>
