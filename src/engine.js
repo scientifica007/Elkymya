@@ -143,18 +143,19 @@
     const reached=new Set([0]);const queue=[0];
     while(queue.length) for(const v of adj[queue.shift()]) if(!reached.has(v)){reached.add(v);queue.push(v);}
     if(reached.size!==atoms.length) return {kind:'disconnected',title:'ذرات لم ترتبط بعد',message:'لديك مجموعات منفصلة. اربط الذرات التي تريد إدخالها في جزيء واحد، أو احذف الزائد منها.'};
+    const electronic=inspectElectrons(atoms,bonds);
     const nodes=atoms.map(simplify);
     const known=MOLECULES.find(m=>structureMatches(nodes,edges,m));
     if(known) {
-      const electronic=inspectElectrons(atoms,bonds);
       if(electronic.invalid || (electronic.complete && (electronic.netCharge!==0||electronic.totalRadicals!==0))) {
         return {kind:'electronic-variant',title:'الرسم يشبه جزيئًا معروفًا، لكن توصيف الإلكترونات مختلف',message:'الرسم البنيوي يطابق '+known.name+'، إلا أن الشحنات أو الإلكترونات التي أدخلتها لا تسمح باعتماده النوع الكيميائي نفسه دون تحقق إضافي.',molecule:known};
       }
       return {kind:'found',title:'اكتشاف بنية معروفة!',message:known.overview,molecule:known};
     }
+    if(electronic.invalid) return {kind:'electronic-inconsistent',title:'التوصيف الإلكتروني يحتاج مراجعة',message:'هناك قيم للشحنة أو الإلكترونات غير المزدوجة لا تتوافق حسابيًا مع الروابط المرسومة في نموذج لويس. راجعها في تقرير التركيب.'};
     const valences=Array(atoms.length).fill(0);
     for(const [a,b,o] of edges){valences[a]+=o;valences[b]+=o;}
-    const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max);
+    const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max && electronic.entries[i].state!=='consistent');
     if(excess) return {kind:'overbonded',title:'الروابط تحتاج مراجعة',message:`في النموذج المبسط الحالي، لا تتوافق هذه الروابط مع التكافؤ المعتاد لعنصر ${describeAtom(excess)}. جرّب تقليل رتبة رابطة أو تغيير التركيب. بعض الجزيئات الحقيقية تتطلب قواعد أكثر تقدمًا.`};
     const pending=atoms.filter((a,i)=>valences[i]<ELEMENTS[a.symbol].max);
     if(pending.length) return {kind:'building',title:'قد يكون الجزيء غير مكتمل',message:'جرّب إضافة ذرات أو تعديل الروابط. هذه إشارة وفق قاعدة التكافؤ المبسطة، وليست حكمًا نهائيًا على إمكان وجود المادة.'};
