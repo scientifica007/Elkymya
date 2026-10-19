@@ -7,7 +7,7 @@ const read = rel => readFileSync(path.join(root, rel), 'utf8');
 const output = [
   read('src/document-head.html'),
   '<style>\n', read('src/styles.css'), '\n</style>\n</head>\n<body>\n',
-  read('src/body.html'), '\n<script>\n', read('src/engine.js'),
+  read('src/body.html'), '\n<script>\n', read('src/electron-model.js'), '\n</script>\n<script>\n', read('src/engine.js'),
   '\n</script>\n<script>\n', read('src/app.js'),
   '\n</script>\n</body>\n</html>\n'
 ].join('');
