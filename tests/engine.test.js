@@ -1,0 +1,40 @@
+'use strict';
+const assert = require('node:assert/strict');
+const {MOLECULES,analyze,structureMatches,inspectStructure}=require('../src/engine.js');
+function asEditor(nodes,edges){return {atoms:nodes.map((symbol,i)=>({id:'a'+i,symbol})),bonds:edges.map(([a,b,order])=>({a:'a'+a,b:'a'+b,order}))};}
+let passed=0;
+for(const m of MOLECULES){
+ const {atoms,bonds}=asEditor(m.nodes,m.edges);
+ let result=analyze(atoms,bonds);
+ assert.equal(result.kind,'found',`Expected ${m.id} found, got ${result.kind}`);
+ assert.equal(result.molecule.id,m.id);
+ const remapped={atoms:atoms.slice().reverse(),bonds:bonds.slice().reverse().map(b=>({a:b.b,b:b.a,order:b.order}))};
+ result=analyze(remapped.atoms,remapped.bonds);
+ assert.equal(result.molecule?.id,m.id,`Reordered ${m.id} misidentified`);
+ passed+=2;
+}
+const water=MOLECULES.find(m=>m.id==='water');
+assert.equal(structureMatches(['O','H','H'],[[0,1,1],[0,2,1]],water),true); passed++;
+const isomers=MOLECULES.filter(m=>m.formula==='C₂H₆O');
+assert.equal(isomers.length,2); passed++;
+assert.equal(structureMatches(isomers[0].nodes,isomers[0].edges,isomers[1]),false); passed++;
+let test=asEditor(['O','H','H'],[[0,1,1]]);
+assert.equal(analyze(test.atoms,test.bonds).kind,'disconnected'); passed++;
+test=asEditor(['H','H'],[[0,1,2]]);
+assert.equal(analyze(test.atoms,test.bonds).kind,'overbonded'); passed++;
+test=asEditor(['O','O'],[[0,1,1]]);
+assert.equal(analyze(test.atoms,test.bonds).kind,'building'); passed++;
+test=asEditor(['O','O','O'],[[0,1,1],[1,2,1],[2,0,1]]);
+assert.equal(analyze(test.atoms,test.bonds).kind,'unknown'); passed++;
+assert.equal(analyze([],[]).kind,'empty'); passed++;
+assert.equal(analyze([{id:'1',symbol:'H'}],[]).kind,'building'); passed++;
+console.log(`PASS: ${passed} assertions across ${MOLECULES.length} curated molecular structures`);
+const screenshot=asEditor(['H','O','C','O','O','O','O'],[[0,1,1],[1,2,1],[2,3,1],[2,4,1],[4,5,1],[5,6,1]]);
+const report=inspectStructure(screenshot.atoms,screenshot.bonds);
+assert.equal(report.formula,'CHO₅');
+assert.equal(report.bondCount,6);
+assert.equal(report.result.kind,'building');
+assert.equal(report.atomDetails[2].used,3);
+assert.equal(report.atomDetails[3].used,1);
+assert.equal(report.atomDetails[6].used,1);
+console.log('PASS: screenshot CHO₅ diagnostic (formula, 6 bonds, carbon=3, terminal oxygen=1)');
