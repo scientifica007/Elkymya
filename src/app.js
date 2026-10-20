@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const {ELEMENTS,MOLECULES,analyze,inspectStructure}=window.MatterLabEngine;
+const {ELEMENTS,MOLECULES,CATALOG,analyze,inspectStructure}=window.MatterLabEngine;
 const STORAGE_KEY='matter-lab-discoveries-v1';
 const $=selector=>document.querySelector(selector);
 const el=(tag, className, text)=>{const n=document.createElement(tag); if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;};
@@ -63,12 +63,17 @@ function showStructureReport(){
  const info=inspectStructure(atoms,bonds),out=$('#structure-report-content'),res=info.result;
  if(!atoms.length){out.innerHTML='<div class="analysis-note">لم تضف أي ذرات بعد. أضف ذرتين على الأقل وجرّب ربطهما.</div>';showModal('structure-report');return;}
  const known=res.kind==='found';
+ const species=known&&res.molecule.group==='أيونات وجذور';
  let verdict='',type='',occ='';
  if(known){
   verdict=`<div class="analysis-note analysis-ok"><strong>بنية موثقة: ${htmlEscape(res.molecule.name)}</strong><div>${htmlEscape(res.molecule.overview)}</div><div>${htmlEscape(res.molecule.extra)}</div></div>`;
-  const source=EVIDENCE[res.molecule.id]||{};
-  const cell=item=>item?htmlEscape(item.note)+'<p class="analysis-small"><a class="analysis-link" href="'+htmlEscape(item.url)+'" target="_blank" rel="noopener noreferrer">المصدر: '+htmlEscape(item.source)+'</a></p>':'لم تُراجع هذه المعلومة بعد؛ غياب التوثيق هنا ليس دليلًا على عدم الوجود.';
-  occ=`<h3 class="analysis-section-title">الوجود الطبيعي والتحضير الصناعي (بحسب السجلات الموثقة)</h3><div class="analysis-grid"><div class="analysis-tile"><strong>في الطبيعة</strong>${cell(source.natural)}</div><div class="analysis-tile"><strong>صناعيًا</strong>${cell(source.industrial)}</div></div>`;
+  if(species){
+   occ=`<div class="analysis-note analysis-ok"><strong>مصدر علمي موثق</strong><p><a class="analysis-link" href="${htmlEscape(res.molecule.source.url)}" target="_blank" rel="noopener noreferrer">${htmlEscape(res.molecule.source.label)}</a></p>توثيق الهوية الكيميائية لا يعني ثبات النوع في جميع الظروف.</div>`;
+  } else {
+   const source=EVIDENCE[res.molecule.id]||{};
+   const cell=item=>item?htmlEscape(item.note)+'<p class="analysis-small"><a class="analysis-link" href="'+htmlEscape(item.url)+'" target="_blank" rel="noopener noreferrer">المصدر: '+htmlEscape(item.source)+'</a></p>':'لم تُراجع هذه المعلومة بعد؛ غياب التوثيق هنا ليس دليلًا على عدم الوجود.';
+   occ=`<h3 class="analysis-section-title">الوجود الطبيعي والتحضير الصناعي (بحسب السجلات الموثقة)</h3><div class="analysis-grid"><div class="analysis-tile"><strong>في الطبيعة</strong>${cell(source.natural)}</div><div class="analysis-tile"><strong>صناعيًا</strong>${cell(source.industrial)}</div></div>`;
+  }
  }else if(res.kind==='electronic-variant'){
   verdict=`<div class="analysis-note"><strong>البنية تشبه ${htmlEscape(res.molecule.name)} لكنها إلكترونيًا ليست مؤكدة النوع نفسه.</strong><div>${htmlEscape(res.message)}</div></div>`;
 
@@ -79,14 +84,16 @@ function showStructureReport(){
  }else{
   verdict=`<div class="analysis-note"><strong>الحالة العلمية غير محسومة بهذا المحرك</strong><div>${htmlEscape(res.message)}</div>عدم وجود تركيب في موسوعتنا لا يسمح بالحكم بأنه ممكن نظريًا، أو مستحيل نظريًا، أو موجود طبيعيًا أو صناعيًا.</div>`;
  }
- type=known?'<strong>مطابقة بنيوية لمركب موثق في الموسوعة</strong>':'<strong>صيغة تركيبك لا تعني بالضرورة وجود جزيء مستقل</strong>';
+ type=known?'<strong>'+(species?'نوع كيميائي موثق مع تحديد الشحنة والإلكترونات':'مطابقة بنيوية لبنية موثقة في الموسوعة')+'</strong>':'<strong>الصيغة لا تثبت وجود نوع كيميائي مستقر</strong>';
  const atomRows=info.atomDetails.map(a=>`<tr><td>${a.number}</td><td dir="ltr">${htmlEscape(a.symbol)}</td><td>${a.links}</td><td>${a.used}</td><td>${a.limit===null?'—':a.limit}</td><td>${htmlEscape(a.typical)}</td></tr>`).join('');
  const c={};for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
  const matches=MOLECULES.filter(m=>{const t={};m.nodes.forEach(s=>t[s]=(t[s]||0)+1);return Object.keys(t).length===Object.keys(c).length && Object.entries(c).every(([k,v])=>t[k]===v)});
  const same=(!known&&matches.length)?`<div class="analysis-note">وجدنا جزيئات معروفة لها <strong>عدد الذرات نفسه</strong> في موسوعتنا، لكن ذلك لا يعني تطابق بنيتها مع رسمك: ${matches.map(m=>htmlEscape(m.name)).join('، ')}.</div>`:'';
- const electronNote=(info.totalValenceElectrons%2===1)?`<div class="analysis-note"><strong>ملاحظة إلكترونية إضافية:</strong> مجموع إلكترونات التكافؤ للذرات المرسومة هو ${info.totalValenceElectrons} (عدد فردي). إذا كان النوع الكيميائي متعادل الشحنة، فلن تكون كل إلكتروناته مزدوجة؛ لذلك لا يمكن التعامل معه باعتباره جزيئًا متعادلًا مغلق الغلاف الإلكتروني. قد يكون جذرًا أو يتطلب وصفًا مختلفًا، ولا نستنتج استقراره من ذلك.</div>`:'';
+ const electronNote=info.electronic.complete
+ ?`<div class="analysis-note"><strong>حساب إلكترونات التكافؤ:</strong> مجموع إلكترونات ذراتك قبل تعديل الشحنة = ${info.totalValenceElectrons}. مجموع الشحنات = ${info.electronic.netCharge}. إذن المجموع الفعلي = <strong>${info.effectiveValenceElectrons} إلكترونًا</strong>. ${info.effectiveValenceElectrons%2?'هذا العدد فردي؛ لا يمكن أن تكون الإلكترونات جميعها مزدوجة.':'العدد زوجي؛ لا يكفي وحده لإثبات الاستقرار أو تحديد الحالة المغناطيسية.'}</div>`
+ :`<div class="analysis-note"><strong>إلكترونات التكافؤ الأساسية:</strong> ${info.totalValenceElectrons}. الشحنات غير مكتملة أو لم تُدخل؛ لذلك لا نعرف العدد الفعلي لإلكترونات هذا النوع، ولا نجزم بزوجيته.</div>`;
  const e=info.electronic;
- const eMessage=e.complete?'إدخالاتك متسقة حسابيًا؛ مجموع الشحنات الشكلية: '+e.netCharge+'، والإلكترونات غير المزدوجة المسجلة: '+e.totalRadicals+'.':e.invalid?'بعض الإدخالات لا تسمح بتوزيع إلكترونات متسق في هذا النموذج؛ راجع الذرات المحددة.':e.assigned?'لم تصف جميع الذرات إلكترونيًا؛ لا يمكن حساب الشحنة الإجمالية بعد.':'لم تحدد أي شحنات شكلية أو إلكترونات منفردة؛ التحليل بنيوي فقط.';
+ const eMessage=e.complete?'إدخالاتك متسقة حسابيًا؛ مجموع الشحنات الشكلية: '+e.netCharge+'، وإلكترونات التكافؤ الفعلية: '+e.totalElectrons+'، والإلكترونات غير المزدوجة المسجلة: '+e.totalRadicals+'.':e.invalid?'بعض الإدخالات لا تسمح بتوزيع إلكترونات متسق في هذا النموذج؛ راجع الذرات المحددة.':e.assigned?'لم تصف جميع الذرات إلكترونيًا؛ لا يمكن حساب الشحنة الإجمالية بعد.':'لم تحدد أي شحنات شكلية أو إلكترونات منفردة؛ التحليل بنيوي فقط.';
  const electronicRows=e.entries.map((a,i)=>`<tr><td>${i+1}</td><td dir="ltr">${htmlEscape(a.symbol)}</td><td>${a.charge===null?'—':a.charge}</td><td>${a.radicals===null?'—':a.radicals}</td><td>${a.lonePairs===null?'—':a.lonePairs}</td><td>${htmlEscape(a.reason||'غير محدد')}</td></tr>`).join('');
  const electronicPanel=`<h3 class="analysis-section-title">الشحنات والإلكترونات (نموذج لويس)</h3><div class="analysis-note">${htmlEscape(eMessage)} هذا فحص حسابي وليس دليلًا على استقرار المادة.</div><div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>ذرة</th><th>رمز</th><th>الشحنة الشكلية</th><th>منفردة</th><th>أزواج حرة</th><th>التفسير</th></tr></thead><tbody>${electronicRows}</tbody></table></div>`;
  const caution=known&&res.molecule.caution?`<div class="analysis-note">${htmlEscape(res.molecule.caution)}</div>`:'';
@@ -94,12 +101,12 @@ function showStructureReport(){
  <div class="analysis-grid"><div class="analysis-tile"><strong>عدد الذرات</strong>${info.atomCount} ذرة · مجموع الكتل الذرية ${info.totalMass.toFixed(3)} u تقريبًا</div><div class="analysis-tile"><strong>عدد الروابط المرسومة</strong>${info.bondCount} رابطة (مفردة: ${info.edgeCounts.single}، مزدوجة: ${info.edgeCounts.double}، ثلاثية: ${info.edgeCounts.triple})</div></div>
  ${verdict}${electronNote}${same}${occ}${electronicPanel}<h3 class="analysis-section-title">فحص كل ذرة</h3>
  <div style="overflow-x:auto"><table class="analysis-table"><thead><tr><th>رقم</th><th>عنصر</th><th>وصلات</th><th>مجموع رتبها</th><th>المعتاد</th><th>الملاحظة</th></tr></thead><tbody>${atomRows}</tbody></table></div>
- ${caution}<div class="analysis-note">حدود التحليل: لا يمثل هذا الإصدار الشحنة الشكلية ولا الإلكترونات الحرة أو الرنين بصورة كاملة، ولا يقدّر الاستقرار بالطاقة الكمّية أو إمكانية التصنيع. إن وصف «غير موجود في الفهرس» ليس حكمًا باستحالة وجوده.</div>
+ ${caution}<div class="analysis-note">حدود التحليل: يمثل الشحنات الشكلية والجذور بطريقة مبسطة، لكنه لا يحسب الرنين الكامل، ولا يقدّر الاستقرار بالطاقة الكمّية أو إمكانية التصنيع. إن وصف «غير موجود في الفهرس» ليس حكمًا باستحالة وجوده.</div>
  <p class="analysis-small">للتوسع: <a class="analysis-link" href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubChem</a> وقاموس <a class="analysis-link" href="https://goldbook.iupac.org/" target="_blank" rel="noopener noreferrer">IUPAC</a> (تحتاج المواقع الخارجية إلى اتصال بالإنترنت).</p>`;
  showModal('structure-report');
 }
 
-function loadDiscoveries(){try{const arr=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return new Set(Array.isArray(arr)?arr.filter(id=>MOLECULES.some(m=>m.id===id)):[]);}catch{return new Set();}}
+function loadDiscoveries(){try{const arr=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return new Set(Array.isArray(arr)?arr.filter(id=>CATALOG.some(m=>m.id===id)):[]);}catch{return new Set();}}
 function saveDiscoveries(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify([...discovered]));}catch{/* private mode */}}
 function pushUndo(){history.push(JSON.stringify({atoms,bonds})); if(history.length>60)history.shift();}
 function undo(){if(!history.length)return;const state=JSON.parse(history.pop());atoms=state.atoms;bonds=state.bonds;selected=null;render();}
@@ -165,14 +172,14 @@ function renderResult(){const result=analyze(atoms,bonds);const found=result.kin
  if(found&&result.molecule.id!==lastFoundId){const m=result.molecule;const isNew=!discovered.has(m.id);if(isNew){discovered.add(m.id);saveDiscoveries();showToast('اكتشاف جديد: '+m.name,'أحسنت! أُضيف إلى موسوعة اكتشافاتك.');}
  lastFoundId=m.id;
  }else if(!found){lastFoundId=null;}
- $('#result-below').textContent=found?'اكتشفت بنية جزيء معروف. نجاح الرسم لا يعني حدوث تفاعل كيميائي تلقائيًا.':'هذا النموذج يفحص بنى جزيئية محددة؛ لا يحاكي التفاعلات أو شروط تكوين المواد بعد.';
+ $('#result-below').textContent=found?'اكتشفت نوعًا كيميائيًا موثقًا. نجاح الرسم لا يعني حدوث تفاعل كيميائي تلقائيًا.':'هذا النموذج يفحص بنى جزيئية محددة؛ لا يحاكي التفاعلات أو شروط تكوين المواد بعد.';
  updateProgress();}
 function render(){renderStage();updateHint();renderResult();}
-function updateProgress(){const count=discovered.size;$('#discoveries-count').textContent=count;$('#total-count').textContent=MOLECULES.length;$('#progress-count').textContent=count+' / '+MOLECULES.length;$('#progress-bar').style.width=(100*count/MOLECULES.length)+'%';}
+function updateProgress(){const count=discovered.size;$('#discoveries-count').textContent=count;$('#total-count').textContent=CATALOG.length;$('#progress-count').textContent=count+' / '+CATALOG.length;$('#progress-bar').style.width=(100*count/CATALOG.length)+'%';}
 function showToast(title,desc){const toast=$('#toast');$('#toast-title').textContent=title;$('#toast-desc').textContent=desc;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3300);}
 function showModal(which){const modal=$('#'+which);modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(which==='encyclopedia')renderEncyclopedia();modal.querySelector('.close').focus();}
 function closeModal(which){const modal=$('#'+which);modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
-function renderEncyclopedia(){const container=$('#discovery-list');container.textContent='';for(const m of MOLECULES){const known=discovered.has(m.id);const b=el('button','discovery-tile'+(known?'':' locked'));b.type='button';b.innerHTML=known?`<strong>${htmlEscape(m.formula)}</strong><span>${htmlEscape(m.name)}</span>`:'<strong>؟</strong><span>لم يُكتشف بعد</span>';
+function renderEncyclopedia(){const container=$('#discovery-list');container.textContent='';for(const m of CATALOG){const known=discovered.has(m.id);const b=el('button','discovery-tile'+(known?'':' locked'));b.type='button';b.innerHTML=known?`<strong>${htmlEscape(m.formula)}</strong><span>${htmlEscape(m.name)}</span>`:'<strong>؟</strong><span>لم يُكتشف بعد</span>';
  b.disabled=!known;if(known)b.addEventListener('click',()=>{$('#discovery-info').hidden=false;$('#discovery-info').innerHTML=`<strong>${htmlEscape(m.name)} — ${htmlEscape(m.formula)}</strong><span>${htmlEscape(m.overview)} ${htmlEscape(m.extra)}</span>${m.caution?`<div class="caution">${htmlEscape(m.caution)}</div>`:''}`;});container.append(b);}
  $('#discovery-info').hidden=true;}
 function bindEvents(){for(const t of document.querySelectorAll('.bond-tool'))t.addEventListener('click',()=>setBondOrder(Number(t.dataset.order)));

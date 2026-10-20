@@ -29,11 +29,11 @@ const ammonium=editor(['N','H','H','H','H'],[[0,1,1],[0,2,1],[0,3,1],[0,4,1]],{0
 e=inspectElectrons(ammonium.atoms,ammonium.bonds);
 check(e.complete&&e.netCharge===1,'ammonium charge and electron accounting');
 check(e.entries[0].lonePairs===0,'ammonium nitrogen zero lone pairs');
-check(analyze(ammonium.atoms,ammonium.bonds).kind==='unknown','ammonium must not be dismissed as overbonded nor invented as curated');
+check(analyze(ammonium.atoms,ammonium.bonds).molecule?.id==='ammonium-ion','ammonium matches documented ion');
 const badWater=editor(['O','H','H'],[[0,1,1],[0,2,1]],{0:1,1:0,2:0},{0:0,1:0,2:0});
 check(inspectElectrons(badWater.atoms,badWater.bonds).invalid,'invalid charge parity flagged');
-check(analyze(badWater.atoms,badWater.bonds).kind==='electronic-variant','known skeleton with invalid electron state must not be discovered');
-const chargedWater=editor(['O','H','H'],[[0,1,1],[0,2,1]],{0:0,1:0,2:1},{0:0,1:0,2:0});
+check(analyze(badWater.atoms,badWater.bonds).kind==='electronic-inconsistent','invalid electronic state must never be discovered');
+const chargedWater=editor(['O','H','H'],[[0,1,1],[0,2,1]],{0:1,1:0,2:0},{0:1,1:0,2:0});
 check(analyze(chargedWater.atoms,chargedWater.bonds).kind==='electronic-variant','charged known connectivity not automatically same neutral molecule');
 const ozone=MOLECULES.find(x=>x.id==='ozone');
 check(ozone.caution.includes('الرنين'),'ozone remains resonance-cautioned');
