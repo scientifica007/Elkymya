@@ -52,5 +52,5 @@ equal(analyze(chargedWater.atoms,chargedWater.bonds).kind,'electronic-variant','
 equal(inspectStructure(chargedWater.atoms,chargedWater.bonds).formula,'H₂O⁺·','charged radical formula');
 const ionNotCurated=specimen(['N','H','H','H'],[[0,1,1],[0,2,1],[0,3,1]],{
  0:{formalCharge:1,unpairedElectrons:1},1:{formalCharge:0,unpairedElectrons:0},2:{formalCharge:0,unpairedElectrons:0},3:{formalCharge:0,unpairedElectrons:0}});
-equal(analyze(ionNotCurated.atoms,ionNotCurated.bonds).kind,'electronic-inconsistent','nitrogen unsound electronic assignment flagged');
+equal(analyze(ionNotCurated.atoms,ionNotCurated.bonds).kind,'electronic-variant','valid non-curated electronic variant not confused with ammonia');
 console.log('PASS: '+passed+' ion/radical identity and valence regression assertions');
