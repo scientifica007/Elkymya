@@ -79,6 +79,44 @@
       'هذه ظاهرة تسمى التماكب البنيوي: الصيغة نفسها لا تعني دائمًا المادة نفسها.','كيمياء الكربون')
   ];
 
+  // Individually verified electronic species: no automatic species inference from composition alone.
+  // Lewis formal charges and explicit unpaired electrons belong to each atom in reference.nodes.
+  const SPECIES = [
+    {id:'hydroxide',name:'أيون الهيدروكسيد',formula:'OH⁻',group:'أيونات وجذور',
+      nodes:['O','H'],edges:[[0,1,1]],states:[[-1,0],[0,0]],
+      overview:'أحسنت! هذا أيون الهيدروكسيد OH⁻: ذرة أكسجين وذرة هيدروجين مرتبطتان، وشحنته الإجمالية −1.',
+      extra:'له ثمانية إلكترونات تكافؤ، منها ثلاثة أزواج حرة على الأكسجين في رسم لويس المبسط. يوجد غالبًا في المحاليل والمواد الأيونية وليس جزيئًا متعادلًا مستقلاً كالماء.',
+      caution:'لا تخلط بين أيون الهيدروكسيد OH⁻ وجذر الهيدروكسيل OH·، فهما نوعان كيميائيان مختلفان.',
+      source:{label:'PubChem — Hydroxide (CID 961)',url:'https://pubchem.ncbi.nlm.nih.gov/compound/961'}},
+    {id:'hydroxyl-radical',name:'جذر الهيدروكسيل الحر',formula:'OH·',group:'أيونات وجذور',
+      nodes:['O','H'],edges:[[0,1,1]],states:[[0,1],[0,0]],
+      overview:'اكتشفت جذر الهيدروكسيل OH·، وهو نوع متعادل كهربائيًا لكنه يحتوي إلكترونًا غير مزدوج.',
+      extra:'في نموذج لويس المبسط يمتلك سبعة إلكترونات تكافؤ، منها إلكترون غير مزدوج على الأكسجين. الجذر شديد التفاعل ولا ينبغي الخلط بينه وبين أيون OH⁻.',
+      caution:'هذا الجذر شديد التفاعل؛ المعلومات لا تعني أن محاولة صنعه في الواقع آمنة.',
+      source:{label:'NIST Chemistry WebBook — Hydroxyl radical',url:'https://webbook.nist.gov/cgi/cbook.cgi?ID=3352576'}},
+    {id:'ammonium-ion',name:'أيون الأمونيوم',formula:'NH₄⁺',group:'أيونات وجذور',
+      nodes:['N','H','H','H','H'],edges:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]],states:[[1,0],[0,0],[0,0],[0,0],[0,0]],
+      overview:'أحسنت! هذه بنية أيون الأمونيوم NH₄⁺، وتتكون من نيتروجين وأربع ذرات هيدروجين وتحمل شحنة موجبة واحدة.',
+      extra:'يمتلك ثمانية إلكترونات تكافؤ، وتكوّن ذرة النيتروجين أربع روابط مفردة دون أزواج إلكترونية حرة في نموذج لويس. يوجد ضمن أملاح ومحاليل عديدة.',
+      caution:'لا تعتبره أمونيا NH₃؛ فشحنته وبنيته مختلفتان.',
+      source:{label:'PubChem — Ammonium (CID 223)',url:'https://pubchem.ncbi.nlm.nih.gov/compound/223'}}
+  ];
+  const CATALOG=[...MOLECULES,...SPECIES];
+  const SUB='₀₁₂₃₄₅₆₇₈₉', SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+  const digits=(value,alphabet)=>String(value).replace(/[0-9]/g,n=>alphabet[Number(n)]);
+  function suffixForState(charge,radicals) {
+    if(!Number.isInteger(charge))return '';
+    const mag=Math.abs(charge);
+    const sign=charge===0?'':(mag===1?'':digits(mag,SUP))+(charge>0?'⁺':'⁻');
+    return sign+(radicals>0?'·':'');
+  }
+  function speciesMatches(nodes,edges,electronic,species) {
+    if(!electronic.complete||electronic.invalid)return false;
+    const input=nodes.map((symbol,i)=>symbol+'|'+electronic.entries[i].charge+'|'+electronic.entries[i].radicals);
+    const reference={nodes:species.nodes.map((symbol,i)=>symbol+'|'+species.states[i][0]+'|'+species.states[i][1]),edges:species.edges};
+    return structureMatches(input,edges,reference);
+  }
+
   const simplify = atom => atom && (atom.symbol || atom.element);
   function counts(nodes) {
     const out={};
@@ -145,14 +183,21 @@
     if(reached.size!==atoms.length) return {kind:'disconnected',title:'ذرات لم ترتبط بعد',message:'لديك مجموعات منفصلة. اربط الذرات التي تريد إدخالها في جزيء واحد، أو احذف الزائد منها.'};
     const electronic=inspectElectrons(atoms,bonds);
     const nodes=atoms.map(simplify);
+    // Validate entered electrons BEFORE awarding an identification, including for known skeletons.
+    if(electronic.invalid) return {kind:'electronic-inconsistent',title:'التوصيف الإلكتروني يحتاج مراجعة',message:'البيانات الإلكترونية التي أدخلتها لا تتوافق مع الرسم في نموذج لويس؛ راجع الشحنات والإلكترونات غير المزدوجة.'};
+    if(electronic.assigned && !electronic.complete) return {kind:'electron-incomplete',title:'استكمل التوصيف الإلكتروني',message:'حددت خصائص بعض الذرات فقط. حدد شحنة وإلكترونات كل ذرة، أو امسح التوصيفات كلها للعودة إلى البناء الحر.'};
+    if(electronic.complete) {
+      const species=SPECIES.find(m=>speciesMatches(nodes,edges,electronic,m));
+      if(species)return {kind:'found',title:'اكتشاف نوع كيميائي موثّق!',message:species.overview,molecule:species};
+    }
     const known=MOLECULES.find(m=>structureMatches(nodes,edges,m));
     if(known) {
-      if(electronic.invalid || (electronic.complete && (electronic.netCharge!==0||electronic.totalRadicals!==0))) {
-        return {kind:'electronic-variant',title:'الرسم يشبه جزيئًا معروفًا، لكن توصيف الإلكترونات مختلف',message:'الرسم البنيوي يطابق '+known.name+'، إلا أن الشحنات أو الإلكترونات التي أدخلتها لا تسمح باعتماده النوع الكيميائي نفسه دون تحقق إضافي.',molecule:known};
+      if(electronic.complete && (electronic.netCharge!==0||electronic.totalRadicals!==0)) {
+        return {kind:'electronic-variant',title:'تركيب إلكتروني مختلف عن الجزيء المعروف',message:'الرسم يشبه '+known.name+'، لكن الشحنة أو الإلكترونات غير المزدوجة تغيّر الهوية الكيميائية. لا يمكن منحه اسم الجزيء المتعادل دون مرجع خاص.',molecule:known};
       }
       return {kind:'found',title:'اكتشاف بنية معروفة!',message:known.overview,molecule:known};
     }
-    if(electronic.invalid) return {kind:'electronic-inconsistent',title:'التوصيف الإلكتروني يحتاج مراجعة',message:'هناك قيم للشحنة أو الإلكترونات غير المزدوجة لا تتوافق حسابيًا مع الروابط المرسومة في نموذج لويس. راجعها في تقرير التركيب.'};
+    if(electronic.complete) return {kind:'electronic-unknown',title:'تركيب إلكتروني متسق لكنه غير مدرج',message:'العد الإلكتروني متسق وفق نموذج لويس، لكن لا توجد مطابقة موثقة لهذا النوع في موسوعتنا. لا نجزم باستقراره أو إمكانية تحضيره.'};
     const valences=Array(atoms.length).fill(0);
     for(const [a,b,o] of edges){valences[a]+=o;valences[b]+=o;}
     const excess=atoms.find((a,i)=>valences[i]>ELEMENTS[a.symbol].max && electronic.entries[i].state!=='consistent');
@@ -168,8 +213,10 @@
     const electronic=inspectElectrons(atoms,bonds);
     const c={}; for(const a of atoms)c[a.symbol]=(c[a.symbol]||0)+1;
     const order=['C','H',...Object.keys(c).filter(x=>!['C','H'].includes(x)).sort()];
-    const displayDigit=n=>String(n).replace(/[0-9]/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
-    const formula=order.filter(s=>c[s]).map(s=>s+(c[s]>1?displayDigit(c[s]):'')).join('');
+    const baseFormula=order.filter(s=>c[s]).map(s=>s+(c[s]>1?digits(c[s],SUB):'')).join('');
+    // Known structures use their documented formula; otherwise show total known charge (when complete).
+    const knownFormula=result.kind==='found'?result.molecule.formula:null;
+    const formula=knownFormula||(baseFormula+(electronic.complete?suffixForState(electronic.netCharge,electronic.totalRadicals):''));
     const byId=new Map(atoms.map(a=>[a.id,a]));
     const atomDetails=atoms.map((a,i)=>{
       const links=bonds.filter(b=>b.a===a.id||b.b===a.id);
@@ -182,12 +229,12 @@
     const edgeCounts={single:0,double:0,triple:0};
     for(const b of bonds){if(b.order===1)edgeCounts.single++;else if(b.order===2)edgeCounts.double++;else if(b.order===3)edgeCounts.triple++;}
     const totalMass=atoms.reduce((v,a)=>v+(ELEMENTS[a.symbol]?.mass||0),0);
-    const valenceElectrons={H:1,C:4,N:5,O:6,Cl:7};
-    const totalValenceElectrons=atoms.reduce((v,a)=>v+(valenceElectrons[a.symbol]||0),0);
-    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,electronic,c,atomCount:atoms.length,bondCount:bonds.length,
+    const totalValenceElectrons=electronic.totalValence;
+    const effectiveValenceElectrons=electronic.complete?electronic.totalElectrons:null;
+    return {result,formula,atomDetails,edgeCounts,totalMass,totalValenceElectrons,effectiveValenceElectrons,electronic,c,atomCount:atoms.length,bondCount:bonds.length,
       allAtomsKnown:atoms.every(a=>ELEMENTS[a.symbol]), allBondEndsKnown:bonds.every(b=>byId.has(b.a)&&byId.has(b.b))};
   }
-  const api={ELEMENTS,MOLECULES,analyze,structureMatches,inspectStructure,inspectElectrons};
+  const api={ELEMENTS,MOLECULES,SPECIES,CATALOG,analyze,structureMatches,inspectStructure,inspectElectrons,suffixForState};
   if(typeof module==='object'&&module.exports) module.exports=api;
   root.MatterLabEngine=api;
 })(typeof window!=='undefined'?window:globalThis);
